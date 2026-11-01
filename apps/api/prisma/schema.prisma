@@ -1,0 +1,1030 @@
+// iFastFood — iFood-like marketplace: schema Prisma central.
+// Dinheiro em centavos inteiros; taxas em bps; PII sensível criptografada
+// na camada de aplicação (campos `*Encrypted`), nunca no código do cliente.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================
+// ENUMS
+// ==========================================================
+
+enum UserType {
+  CUSTOMER
+  MERCHANT_STAFF
+  COURIER
+  STAFF
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum MerchantPlan {
+  BASIC
+  DELIVERY
+}
+
+enum CommissionBasis {
+  ITEMS
+  ITEMS_AND_DELIVERY
+}
+
+enum PaymentMode {
+  PLATFORM
+  STORE
+}
+
+enum MerchantStatus {
+  ONBOARDING
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  BLOCKED
+  CLOSED
+}
+
+enum MerchantStaffRole {
+  OWNER
+  MANAGER
+  OPERATOR
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+  FREE_DELIVERY
+}
+
+enum CouponStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  CREATED
+  PENDING_ACCEPTANCE
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  IN_PREPARATION
+  READY_FOR_PICKUP
+  DISPATCHED
+  IN_DELIVERY
+  DELIVERED
+  CANCELED
+}
+
+enum DeliveryStatus {
+  OFFERED
+  ACCEPTED
+  PICKED_UP
+  IN_ROUTE
+  DELIVERED
+  RETURNED_TO_MERCHANT
+}
+
+enum PaymentMethod {
+  PIX
+  CARD_CREDIT
+  CARD_DEBIT
+  CASH
+}
+
+enum PaymentGateway {
+  MERCADO_PAGO
+  STRIPE
+  OFFLINE
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  CANCELLED
+  CHARGEBACK
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+enum LedgerSide {
+  DEBIT
+  CREDIT
+}
+
+enum LedgerAccountType {
+  ASSET
+  LIABILITY
+  REVENUE
+  EXPENSE
+}
+
+enum CourierStatus {
+  ONBOARDING
+  PENDING_REVIEW
+  APPROVED
+  ACTIVE
+  SUSPENDED
+  BLOCKED
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  CAR
+  BICYCLE
+  VAN
+}
+
+enum CourierDocumentType {
+  CNH
+  CRLV
+  ANTT
+  CRIMINAL_RECORD
+  SELFIE
+  PROOF_ADDRESS
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum DeliveryZoneType {
+  RADIUS
+  POLYGON
+}
+
+enum NotificationChannel {
+  PUSH
+  SMS
+  EMAIL
+  WHATSAPP
+}
+
+enum TicketPersona {
+  CUSTOMER
+  MERCHANT
+  COURIER
+}
+
+enum TicketStatus {
+  OPEN
+  ASSIGNED
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING_CANCELLATION
+  CANCELED
+  PAST_DUE
+}
+
+enum InvoiceType {
+  MONTHLY_FEE
+  SOFTWARE_SUBSCRIPTION
+  ADJUSTMENT
+}
+
+enum InvoiceStatus {
+  OPEN
+  PAID
+  CANCELED
+}
+
+// ==========================================================
+// IDENTIDADE / RBAC / LGPD
+// ==========================================================
+
+model User {
+  id               String     @id @default(uuid())
+  email            String?    @unique
+  phone            String?    @unique
+  passwordHash     String?
+  name             String
+  userType         UserType
+  status           UserStatus @default(PENDING_VERIFICATION)
+  twoFactorEnabled Boolean    @default(false)
+  twoFactorSecret  String?
+  lastLoginAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  sessions     Session[]
+  consents     Consent[]
+  roles        Role[]
+  customer     Customer?
+  courier      Courier?
+  staffPosts   MerchantStaff[]
+  auditLogs    AuditLog[]
+  notifications Notification[]
+  tickets      SupportTicket[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Session {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id])
+  refreshTokenHash String    @unique
+  userAgent        String?
+  ip               String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  isSystem    Boolean @default(false)
+  users       User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id          String @id @default(uuid())
+  code        String @unique
+  description String
+  roles       Role[]
+}
+
+model Consent {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  type       String
+  version    String
+  granted    Boolean
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorUserId  String?
+  actor        User?    @relation(fields: [actorUserId], references: [id])
+  action       String
+  resourceType String
+  resourceId   String?
+  payload      Json?
+  ip           String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([resourceType, resourceId])
+}
+
+// ==========================================================
+// CLIENTES
+// ==========================================================
+
+model Customer {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id])
+  documentEncrypted String?
+  birthDate        DateTime?
+  loyaltyPoints    Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  wallet        Wallet?
+  subscriptions CustomerSubscription[]
+  redemptions   CouponRedemption[]
+}
+
+model Address {
+  id         String  @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  label      String?
+  street     String
+  number     String
+  complement String?
+  district   String
+  city       String
+  state      String
+  zipCode    String
+  lat        Decimal @db.Decimal(9, 6)
+  lng        Decimal @db.Decimal(9, 6)
+  isDefault  Boolean @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders Order[]
+  @@index([customerId])
+}
+
+model Wallet {
+  id           String  @id @default(uuid())
+  customerId   String  @unique
+  customer     Customer @relation(fields: [customerId], references: [id])
+  balanceCents Int     @default(0)
+  updatedAt    DateTime @updatedAt
+
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id         String  @id @default(uuid())
+  walletId   String
+  wallet     Wallet  @relation(fields: [walletId], references: [id])
+  type       String // CREDIT | DEBIT
+  amountCents Int
+  reason     String
+  relatedOrderId String?
+  createdAt  DateTime @default(now())
+
+  @@index([walletId])
+}
+
+model SubscriptionPlan {
+  id         String  @id @default(uuid())
+  name       String
+  slug       String  @unique
+  priceCents Int
+  perks      Json
+  active     Boolean @default(true)
+  createdAt  DateTime @default(now())
+
+  subscriptions CustomerSubscription[]
+}
+
+model CustomerSubscription {
+  id            String             @id @default(uuid())
+  customerId    String
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  planId        String
+  plan          SubscriptionPlan   @relation(fields: [planId], references: [id])
+  status        SubscriptionStatus @default(ACTIVE)
+  startedAt     DateTime           @default(now())
+  nextBillingAt DateTime?
+  canceledAt    DateTime?
+  gateway       String?
+  externalId    String?
+  updatedAt     DateTime           @updatedAt
+
+  @@index([customerId, status])
+}
+
+// ==========================================================
+// PARCEIROS (LOJAS)
+// ==========================================================
+
+model MerchantCategory {
+  id   String @id @default(uuid())
+  name String
+  slug String @unique
+  merchants Merchant[]
+}
+
+model Merchant {
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  name            String
+  categoryId      String
+  category        MerchantCategory @relation(fields: [categoryId], references: [id])
+  status          MerchantStatus @default(ONBOARDING)
+  documentEncrypted String
+  email           String?
+  phone           String?
+  description     String?
+  logoUrl         String?
+  coverUrl        String?
+  street          String?
+  number          String?
+  complement      String?
+  district        String?
+  city            String?
+  state           String?
+  zipCode         String?
+  lat             Decimal?       @db.Decimal(9, 6)
+  lng             Decimal?       @db.Decimal(9, 6)
+  ratingAvg       Decimal        @default(0) @db.Decimal(3, 2)
+  ratingCount     Int            @default(0)
+  orderPrepMinutes Int?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  contract       MerchantContract?
+  staff          MerchantStaff[]
+  menuCategories MenuCategory[]
+  hours          BusinessHour[]
+  zones          DeliveryZone[]
+  orders         Order[]
+  coupons        Coupon[]
+  payouts        Payout[]
+  invoices       Invoice[]
+  tickets        SupportTicket[]
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model MerchantContract {
+  id                    String          @id @default(uuid())
+  merchantId            String          @unique
+  merchant              Merchant        @relation(fields: [merchantId], references: [id])
+  plan                  MerchantPlan
+  commissionBps         Int
+  onlinePaymentFeeBps   Int
+  monthlyFeeCents       Int
+  feeFreeThresholdCents Int
+  commissionBasis       CommissionBasis @default(ITEMS)
+  signedAt              DateTime        @default(now())
+  validUntil            DateTime?
+}
+
+model MerchantStaff {
+  id         String            @id @default(uuid())
+  merchantId String
+  merchant   Merchant          @relation(fields: [merchantId], references: [id])
+  userId     String
+  user       User              @relation(fields: [userId], references: [id])
+  role       MerchantStaffRole @default(OPERATOR)
+  createdAt  DateTime          @default(now())
+
+  @@unique([merchantId, userId])
+}
+
+// ==========================================================
+// CATÁLOGO
+// ==========================================================
+
+model MenuCategory {
+  id          String   @id @default(uuid())
+  merchantId  String
+  merchant    Merchant @relation(fields: [merchantId], references: [id])
+  name        String
+  description String?
+  position    Int      @default(0)
+  active      Boolean  @default(true)
+
+  products Product[]
+  @@index([merchantId])
+}
+
+model Product {
+  id                   String    @id @default(uuid())
+  menuCategoryId       String
+  menuCategory         MenuCategory @relation(fields: [menuCategoryId], references: [id])
+  name                 String
+  description          String?
+  basePriceCents       Int
+  promotionalPriceCents Int?
+  imageUrl             String?
+  active               Boolean   @default(true)
+  paused               Boolean   @default(false) // "indisponível" temporário no Gestor
+  pausedAt             DateTime?
+  isFeatured           Boolean   @default(false)
+  position             Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  optionGroups ProductOptionGroup[]
+  orderItems   OrderItem[]
+
+  @@index([menuCategoryId])
+}
+
+model ProductOptionGroup {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  minSelect Int     @default(0)
+  maxSelect Int     @default(1)
+  required  Boolean @default(false)
+  position  Int     @default(0)
+
+  options ProductOption[]
+  @@index([productId])
+}
+
+model ProductOption {
+  id             String            @id @default(uuid())
+  groupId        String
+  group          ProductOptionGroup @relation(fields: [groupId], references: [id])
+  name           String
+  priceDeltaCents Int              @default(0)
+  active         Boolean           @default(true)
+  position       Int               @default(0)
+
+  @@index([groupId])
+}
+
+model BusinessHour {
+  id          String   @id @default(uuid())
+  merchantId  String
+  merchant    Merchant @relation(fields: [merchantId], references: [id])
+  weekday     Int // 0 = domingo ... 6 = sábado
+  openMinutes Int // minutos desde 00:00 (ex.: 600 = 10h)
+  closeMinutes Int
+
+  @@index([merchantId])
+}
+
+model DeliveryZone {
+  id             String           @id @default(uuid())
+  merchantId     String
+  merchant       Merchant         @relation(fields: [merchantId], references: [id])
+  name           String
+  type           DeliveryZoneType @default(RADIUS)
+  baseFeeCents   Int
+  perKmCents     Int
+  minFeeCents    Int
+  maxKm          Float?
+  minOrderCents  Int              @default(0)
+  etaMinMinutes  Int?
+  etaMaxMinutes  Int?
+  polygon        Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([merchantId])
+}
+
+// ==========================================================
+// MARKETING
+// ==========================================================
+
+model Coupon {
+  id                        String       @id @default(uuid())
+  code                      String       @unique
+  type                      CouponType
+  percentOff                Int?
+  amountOffCents            Int?
+  maxDiscountCents          Int?
+  minOrderCents             Int?
+  validFrom                 DateTime?
+  validUntil                DateTime?
+  maxRedemptions            Int?
+  maxRedemptionsPerCustomer Int?
+  firstOrderOnly            Boolean      @default(false)
+  applicableCategories      String[]
+  status                    CouponStatus @default(ACTIVE)
+  merchantId                String? // null = cupom de plataforma
+  merchant                  Merchant?    @relation(fields: [merchantId], references: [id])
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+
+  redemptions CouponRedemption[]
+  orders      Order[]
+
+  @@index([merchantId])
+}
+
+model CouponRedemption {
+  id        String  @id @default(uuid())
+  couponId  String
+  coupon    Coupon  @relation(fields: [couponId], references: [id])
+  orderId   String  @unique
+  order     Order   @relation(fields: [orderId], references: [id])
+  customerId String
+  customer  Customer @relation(fields: [customerId], references: [id])
+  discountCents Int
+  createdAt DateTime @default(now())
+
+  @@unique([couponId, orderId])
+}
+
+// ==========================================================
+// ENTREGADORES
+// ==========================================================
+
+model Courier {
+  id         String      @id @default(uuid())
+  userId     String      @unique
+  user       User        @relation(fields: [userId], references: [id])
+  status     CourierStatus @default(ONBOARDING)
+  vehicleType VehicleType
+  plate      String?
+  ratingAvg  Decimal     @default(0) @db.Decimal(3, 2)
+  ratingCount Int        @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  documents CourierDocument[]
+  shifts    CourierShift[]
+  locations CourierLocation[]
+  deliveries Delivery[]
+  tickets   SupportTicket[]
+
+  @@index([status])
+}
+
+model CourierDocument {
+  id               String              @id @default(uuid())
+  courierId        String
+  courier          Courier             @relation(fields: [courierId], references: [id])
+  type             CourierDocumentType
+  fileUrl          String
+  status           DocumentStatus      @default(PENDING)
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  rejectReason     String?
+  createdAt        DateTime            @default(now())
+
+  @@index([courierId, status])
+}
+
+model CourierShift {
+  id         String    @id @default(uuid())
+  courierId  String
+  courier    Courier   @relation(fields: [courierId], references: [id])
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+  closedByPlatform Boolean @default(false) // fechamento automático de segurança
+
+  @@index([courierId])
+}
+
+model CourierLocation {
+  id         String   @id @default(uuid())
+  courierId  String
+  courier    Courier  @relation(fields: [courierId], references: [id])
+  lat        Decimal  @db.Decimal(9, 6)
+  lng        Decimal  @db.Decimal(9, 6)
+  recordedAt DateTime @default(now())
+  onDelivery Boolean  @default(false)
+
+  @@index([courierId, recordedAt])
+}
+
+// ==========================================================
+// PEDIDOS
+// ==========================================================
+
+model Order {
+  id                  String          @id @default(uuid())
+  code                String          @unique // ex.: IF-8F3K2
+  customerId          String
+  customer            Customer        @relation(fields: [customerId], references: [id])
+  merchantId          String
+  merchant            Merchant        @relation(fields: [merchantId], references: [id])
+  deliveryAddressId   String?
+  deliveryAddress     Address?        @relation(fields: [deliveryAddressId], references: [id])
+  status              OrderStatus     @default(CREATED)
+  couponId            String?
+  coupon              Coupon?         @relation(fields: [couponId], references: [id])
+  discountCents       Int             @default(0)
+  itemsTotalCents     Int
+  deliveryFeeCents    Int             @default(0)
+  serviceFeeCents     Int             @default(0)
+  totalCents          Int
+  paymentMethod       PaymentMethod
+  paymentMode         PaymentMode
+  // Snapshot imutável das regras no momento do pedido:
+  contractCommissionBps        Int
+  contractOnlinePaymentFeeBps  Int
+  contractCommissionBasis      CommissionBasis
+  commissionCents              Int  @default(0)
+  processingFeeCents           Int  @default(0)
+  notes                   String?
+  scheduledFor            DateTime?
+  // Trilha de tempos:
+  placedAt     DateTime  @default(now())
+  confirmedAt  DateTime?
+  readyAt      DateTime?
+  dispatchedAt DateTime?
+  deliveredAt  DateTime?
+  canceledAt   DateTime?
+  cancelReason String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  items    OrderItem[]
+  events   OrderEventOrderState[]
+  delivery Delivery?
+  payment  Payment?
+  rating   Rating?
+  redemption CouponRedemption[]
+
+  @@index([merchantId, status])
+  @@index([customerId, placedAt])
+}
+
+model OrderItem {
+  id             String  @id @default(uuid())
+  orderId        String
+  order          Order   @relation(fields: [orderId], references: [id])
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id])
+  productName    String // snapshot
+  unitPriceCents Int
+  quantity       Int
+  itemTotalCents Int
+  notes          String?
+  options        OrderItemOption[]
+
+  @@index([orderId])
+}
+
+model OrderItemOption {
+  id             String     @id @default(uuid())
+  orderItemId    String
+  orderItem      OrderItem  @relation(fields: [orderItemId], references: [id])
+  groupName      String?
+  optionName     String
+  priceDeltaCents Int       @default(0)
+
+  @@index([orderItemId])
+}
+
+model OrderEventOrderState {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  fromStatus  String?
+  toStatus    String
+  actorType   String // CUSTOMER | MERCHANT | COURIER | ADMIN | SYSTEM
+  actorUserId String?
+  payload     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ==========================================================
+// LOGÍSTICA
+// ==========================================================
+
+model Delivery {
+  id              String         @id @default(uuid())
+  orderId         String         @unique
+  order           Order          @relation(fields: [orderId], references: [id])
+  status          DeliveryStatus @default(OFFERED)
+  courierId       String?
+  courier         Courier?       @relation(fields: [courierId], references: [id])
+  feeCourierCents Int?
+  distanceKm      Decimal?       @db.Decimal(6, 3)
+  offeredAt       DateTime       @default(now())
+  acceptedAt      DateTime?
+  pickedUpAt      DateTime?
+  inRouteAt       DateTime?
+  arrivedAt       DateTime?
+  deliveredAt     DateTime?
+  returnedAt      DateTime?
+  proofUrl        String?
+  notes           String?
+  updatedAt       DateTime       @updatedAt
+
+  @@index([courierId, status])
+}
+
+// ==========================================================
+// FINANCEIRO
+// ==========================================================
+
+model Payment {
+  id           String         @id @default(uuid())
+  orderId      String         @unique
+  order        Order          @relation(fields: [orderId], references: [id])
+  method       PaymentMethod
+  gateway      PaymentGateway
+  status       PaymentStatus  @default(PENDING)
+  amountCents  Int
+  externalId   String?
+  pixQrCode    String?
+  pixExpiresAt DateTime?
+  cardBrand    String?
+  cardLast4    String?
+  authorizedAt DateTime?
+  paidAt       DateTime?
+  refundedCents Int           @default(0)
+  chargebackAt DateTime?
+  metadata     Json?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  refunds Refund[]
+
+  @@index([status])
+  @@unique([gateway, externalId])
+}
+
+model Refund {
+  id          String       @id @default(uuid())
+  paymentId   String
+  payment     Payment      @relation(fields: [paymentId], references: [id])
+  amountCents Int
+  reason      String
+  status      RefundStatus @default(PENDING)
+  externalId  String?
+  createdAt   DateTime     @default(now())
+  completedAt DateTime?
+
+  @@index([paymentId])
+}
+
+model Payout {
+  id             String       @id @default(uuid())
+  merchantId     String
+  merchant       Merchant     @relation(fields: [merchantId], references: [id])
+  periodStart    DateTime
+  periodEnd      DateTime
+  grossCents     Int
+  commissionCents Int         @default(0)
+  processingFeeCents Int      @default(0)
+  monthlyFeeCents Int         @default(0)
+  netCents       Int
+  status         PayoutStatus @default(PENDING)
+  externalId     String?
+  paidAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  items PayoutItem[]
+
+  @@unique([merchantId, periodStart, periodEnd])
+}
+
+model PayoutItem {
+  id                String @id @default(uuid())
+  payoutId          String
+  payout            Payout @relation(fields: [payoutId], references: [id])
+  orderId           String
+  orderItemsCents   Int
+  orderDeliveryCents Int   @default(0)
+  commissionCents   Int
+  processingFeeCents Int   @default(0)
+  netCents          Int
+
+  @@index([payoutId])
+}
+
+model LedgerAccount {
+  id   String            @id @default(uuid())
+  code String            @unique
+  name String
+  type LedgerAccountType
+
+  entries LedgerEntry[]
+}
+
+model LedgerEntry {
+  id         String          @id @default(uuid())
+  accountId  String
+  account    LedgerAccount   @relation(fields: [accountId], references: [id])
+  side       LedgerSide
+  amountCents Int
+  refType    String
+  refId      String?
+  memo       String?
+  postedAt   DateTime        @default(now())
+
+  @@index([accountId, postedAt])
+}
+
+model Invoice {
+  id          String       @id @default(uuid())
+  merchantId  String
+  merchant    Merchant     @relation(fields: [merchantId], references: [id])
+  type        InvoiceType
+  periodStart DateTime
+  periodEnd   DateTime
+  amountCents Int
+  status      InvoiceStatus @default(OPEN)
+  issuedAt    DateTime     @default(now())
+  paidAt      DateTime?
+
+  @@index([merchantId, status])
+}
+
+// ==========================================================
+// AVALIAÇÕES / SUPORTE / SYSOPS
+// ==========================================================
+
+model Rating {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  merchantRating Int?
+  courierRating  Int?
+  comment       String?
+  createdAt     DateTime @default(now())
+}
+
+model SupportTicket {
+  id          String          @id @default(uuid())
+  persona     TicketPersona
+  subject     String
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  orderId     String?
+  merchantId  String?
+  merchant    Merchant?       @relation(fields: [merchantId], references: [id])
+  courierId   String?
+  courier     Courier?        @relation(fields: [courierId], references: [id])
+  status      TicketStatus    @default(OPEN)
+  priority    TicketPriority  @default(NORMAL)
+  assigneeUserId String?
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  messages TicketMessage[]
+
+  @@index([status, priority])
+}
+
+model TicketMessage {
+  id           String   @id @default(uuid())
+  ticketId     String
+  ticket       SupportTicket @relation(fields: [ticketId], references: [id])
+  authorUserId String?
+  authorType   String // CUSTOMER | MERCHANT | COURIER | STAFF
+  body         String
+  internal     Boolean  @default(false) // nota interna da equipe
+  createdAt    DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id])
+  channel   NotificationChannel
+  title     String
+  body      String
+  payload   Json?
+  sentAt    DateTime?
+  readAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model WebhookEvent {
+  id          String   @id @default(uuid())
+  gateway     PaymentGateway
+  externalId  String
+  payload     Json
+  processedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([gateway, externalId])
+}
+
+model AppConfig {
+  key         String   @id
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model CmsPage {
+  slug        String   @id
+  title       String
+  sections    Json
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  updatedAt   DateTime @updatedAt
+}

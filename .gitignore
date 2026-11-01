@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+generated/
+*.tsbuildinfo
+.next/
+.turbo/
+
+# Test
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Prisma
+prisma/*.db
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Mobile (preenchido nas fases mobile)
+android/.gradle/
+android/**/build/
+ios/Pods/
+ios/**/xcuserdata/
+*.keystore
+!debug.keystore
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

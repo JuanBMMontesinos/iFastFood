@@ -1,0 +1,15 @@
+generatorName: kotlin
+outputDir: generated/kotlin
+inputSpec: generators/openapi/openapi.json
+additionalProperties:
+  packageName: br.com.ifastfood.sdk
+  groupId: br.com.ifastfood
+  artifactId: ifastfood-sdk
+  library: jvm-okhttp4
+  dateLibrary: kotlin-datetime
+  useCoroutines: "true"
+  serializationLibrary: kotlinx_serialization
+globalProperties:
+  generateApiDocumentation: "false"
+  generateModelDocumentation: "false"
+  omitGradleWrapper: "true"

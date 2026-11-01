@@ -1,0 +1,12 @@
+generatorName: swift5
+outputDir: generated/swift
+inputSpec: generators/openapi/openapi.json
+additionalProperties:
+  projectName: IfastFoodSDK
+  projectVersion: 0.1.0
+  podSource: "{ :git => 'https://github.com/ifastfood/ios-sdk.git', :tag => '0.1.0' }"
+  responseAs: "async-await"
+  useCoreData: "NO"
+globalProperties:
+  generateApiDocumentation: "false"
+  generateModelDocumentation: "false"

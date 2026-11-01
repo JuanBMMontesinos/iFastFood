@@ -1,0 +1,51 @@
+# iFastFood — infraestrutura de desenvolvimento local (F0)
+# Uso: docker compose up -d postgres redis
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ifastfood-postgres
+    environment:
+      POSTGRES_USER: ifastfood
+      POSTGRES_PASSWORD: ifastfood_dev
+      POSTGRES_DB: ifastfood
+    ports:
+      - '5432:5432'
+    volumes:
+      - ifastfood_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ifastfood -d ifastfood']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ifastfood-redis
+    ports:
+      - '6379:6379'
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - ifastfood_redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.8
+    container_name: ifastfood-meilisearch
+    ports:
+      - '7700:7700'
+    environment:
+      # Em dev usamos master key fixa; em produção gerar segredo forte.
+      MEILI_MASTER_KEY: ifastfood_dev_meili
+      MEILI_ENV: development
+    volumes:
+      - ifastfood_meilidata:/meili_data
+    profiles: ['search']
+
+volumes:
+  ifastfood_pgdata:
+  ifastfood_redisdata:
+  ifastfood_meilidata:
