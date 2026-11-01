@@ -37,9 +37,9 @@ docker compose up -d postgres redis
 # 3. Configuração do ambiente
 cp .env.example apps/api/.env
 
-# 4. Schema do banco (dev: db push; prod: migrations)
+# 4. Schema do banco (Supabase: migrations versionadas; local: db push)
 pnpm --filter @ifastfood/api db:generate
-pnpm --filter @ifastfood/api db:push
+pnpm --filter @ifastfood/api db:deploy   # aponta DATABASE_URL do apps/api/.env
 
 # 5. API
 pnpm --filter @ifastfood/api dev     # http://localhost:3001/health

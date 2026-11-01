@@ -21,8 +21,9 @@ services:
   redis:
     image: redis:7-alpine
     container_name: ifastfood-redis
+    # 6380 na máquina host para não disputar com stacks locais do usuário
     ports:
-      - '6379:6379'
+      - '6380:6379'
     command: ['redis-server', '--appendonly', 'yes']
     volumes:
       - ifastfood_redisdata:/data
