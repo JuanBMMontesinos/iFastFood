@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
+import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { AppModule } from './app.module';
 
 /**
@@ -32,6 +33,9 @@ async function bootstrap(): Promise<void> {
       forbidUnknownValues: true,
     }),
   );
+
+  // Formato único de erro: { error: { code, message, details? } }
+  app.useGlobalFilters(new ApiExceptionFilter());
 
   app.enableShutdownHooks();
 

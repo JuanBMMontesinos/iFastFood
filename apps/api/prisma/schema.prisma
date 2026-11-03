@@ -241,13 +241,15 @@ model User {
   status           UserStatus @default(PENDING_VERIFICATION)
   twoFactorEnabled Boolean    @default(false)
   twoFactorSecret  String?
+  phoneVerifiedAt  DateTime?
   lastLoginAt      DateTime?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
-  sessions     Session[]
-  consents     Consent[]
-  roles        Role[]
+  sessions      Session[]
+  consents      Consent[]
+  roles         Role[]
+  otpChallenges OtpChallenge[]
   customer     Customer?
   courier      Courier?
   staffPosts   MerchantStaff[]
@@ -260,17 +262,54 @@ model User {
 }
 
 model Session {
-  id               String    @id @default(uuid())
-  userId           String
-  user             User      @relation(fields: [userId], references: [id])
-  refreshTokenHash String    @unique
-  userAgent        String?
-  ip               String?
-  expiresAt        DateTime
-  revokedAt        DateTime?
-  createdAt        DateTime  @default(now())
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  /// Identificador da família de tokens: nasce no login; ao reuso de um
+  /// refresh token já rotacionado, TODA a família é invalidada.
+  familyId   String    @default(uuid())
+  userAgent  String?
+  ip         String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  refreshTokens RefreshToken[]
 
   @@index([userId])
+  @@index([familyId])
+}
+
+/// Cadeia de refresh tokens (rotação): token novo substitui o anterior;
+/// apresentação de token revogado (reuso) invalida a família inteira.
+model RefreshToken {
+  id         String    @id @default(uuid())
+  sessionId  String
+  session    Session   @relation(fields: [sessionId], references: [id])
+  tokenHash  String    @unique
+  /// Hash do token sucessor (rastreabilidade da cadeia de rotação).
+  replacedBy String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([sessionId])
+}
+
+/// Desafios de OTP por telefone (verificação de conta F1; login por OTP na F2).
+model OtpChallenge {
+  id          String    @id @default(uuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
+  targetPhone String
+  purpose     String // PHONE_VERIFY | LOGIN
+  codeHash    String
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([targetPhone, purpose, createdAt])
 }
 
 model Role {

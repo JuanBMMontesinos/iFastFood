@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Public } from '../identity/guards/decorators';
 
 export interface HealthStatus {
   status: 'ok' | 'degraded';
@@ -17,6 +18,7 @@ export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Liveness — não acessa recursos externos. */
+  @Public()
   @Get()
   live(): Pick<HealthStatus, 'status' | 'service' | 'uptimeSeconds'> {
     return {
@@ -27,6 +29,7 @@ export class HealthController {
   }
 
   /** Readiness — valida dependência crítica (Postgres). */
+  @Public()
   @Get('ready')
   async ready(): Promise<HealthStatus> {
     let database: HealthStatus['database'] = 'down';

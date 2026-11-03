@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Contratos compartilhados do iFastFood: schemas Zod de entrada/saída e configs para gerar SDKs Kotlin/Swift do OpenAPI.",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {

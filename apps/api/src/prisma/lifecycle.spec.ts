@@ -1,6 +1,7 @@
 /**
  * Teste unitário do PrismaService sem banco real:
  * @prisma/client é mockado para validar apenas o ciclo de vida (hooks Nest).
+ * Estado do mock é zerado por teste — sem acoplamento entre testes.
  */
 jest.mock('@prisma/client', () => {
   const state = { connectCalls: 0, disconnectCalls: 0 };
@@ -13,14 +14,19 @@ jest.mock('@prisma/client', () => {
     }
   }
   return { PrismaClient: MockPrismaClient, __mockState: state };
-}, { virtual: true });
+});
 
 import * as client from '@prisma/client';
 import { PrismaService } from './prisma.service';
 
+const state = (client as unknown as { __mockState: { connectCalls: number; disconnectCalls: number } })
+  .__mockState;
+
 describe('PrismaService (ciclo de vida, sem banco)', () => {
-  const state = (client as unknown as { __mockState: { connectCalls: number; disconnectCalls: number } })
-    .__mockState;
+  beforeEach(() => {
+    state.connectCalls = 0;
+    state.disconnectCalls = 0;
+  });
 
   it('onModuleInit conecta e onModuleDestroy desconecta', async () => {
     const service = new PrismaService();
@@ -35,6 +41,7 @@ describe('PrismaService (ciclo de vida, sem banco)', () => {
     const b = new PrismaService();
     await a.onModuleInit();
     await b.onModuleInit();
-    expect(state.connectCalls).toBe(3); // 1 do teste anterior + 2 deste
+    expect(state.connectCalls).toBe(2);
+    expect(state.disconnectCalls).toBe(0);
   });
 });

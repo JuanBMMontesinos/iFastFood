@@ -57,7 +57,7 @@ pnpm typecheck
 | Fase | Entregável | Status |
 |---|---|---|
 | F0 | Monorepo, domínio+testes, contratos, API skeleton, Docker, CI, ADRs | ✅ |
-| F1 | Identidade/RBAC/LGPD/auditoria | 🔜 |
+| F1 | Identidade/RBAC/LGPD/auditoria | ✅ |
 | F2 | Parceiros (KYC/contratos/planos) + cardápio + Portal Parceiro | 🔜 |
 | F3 | Pedido ponta-a-ponta + gateways + PWA cliente + Gestor de Pedidos (MVP) | 🔜 |
 | F4 | Motor de despacho + App Entregador (Android) | 🔜 |
