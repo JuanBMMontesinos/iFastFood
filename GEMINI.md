@@ -25,3 +25,4 @@ Este projeto possui planejamento arquitetural e de fases versionado diretamente 
    - Proibido qualquer dado mockado ou chumbado em HTML, componentes React (TSX), arquivos TS ou TXT.
    - Todos os dados de exemplo, métricas executivas, filas de KYC, lançamentos do ledger, cupons e páginas CMS devem ser lidos dinamicamente de suas respectivas tabelas no Supabase via API NestJS.
    - Todos os dados semente devem ser populados diretamente no Supabase via `apps/api/prisma/seed.ts`.
+   - **Toda vez que uma nova tabela for criada no schema do banco de dados, ela DEVE ser imediatamente incluída no `apps/api/prisma/seed.ts` e preenchida no Supabase com dados de exemplo realistas. Nenhuma tabela deve permanecer com 0 registros.**

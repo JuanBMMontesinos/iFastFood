@@ -878,6 +878,520 @@ async function main() {
     },
   });
 
+  // 11. SESSÕES E REFRESH TOKENS (Session, RefreshToken)
+  console.log('11. Gravando Sessões e Refresh Tokens (Session, RefreshToken)...');
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@ifastfood.com.br' },
+    update: {},
+    create: {
+      id: 'user-admin-master',
+      email: 'admin@ifastfood.com.br',
+      phone: '+5511999990000',
+      name: 'Administrador iFastFood',
+      userType: 'STAFF',
+      status: 'ACTIVE',
+    },
+  });
+
+  const session1 = await prisma.session.upsert({
+    where: { id: 'sess-admin-master' },
+    update: {},
+    create: {
+      id: 'sess-admin-master',
+      userId: adminUser.id,
+      familyId: 'fam-sess-admin-01',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      ip: '127.0.0.1',
+      expiresAt: new Date(Date.now() + 30 * 86400 * 1000),
+    },
+  });
+
+  await prisma.refreshToken.upsert({
+    where: { id: 'rt-admin-master' },
+    update: {},
+    create: {
+      id: 'rt-admin-master',
+      sessionId: session1.id,
+      tokenHash: 'hash_sha256_rt_admin_master_001_seeded',
+      expiresAt: new Date(Date.now() + 30 * 86400 * 1000),
+    },
+  });
+
+  // 12. CARTEIRA E TRANSAÇÕES (Wallet, WalletTransaction)
+  console.log('12. Gravando Carteiras e Transações (Wallet, WalletTransaction)...');
+  const walletAna = await prisma.wallet.upsert({
+    where: { customerId: custAna.id },
+    update: {},
+    create: {
+      id: 'wallet-cust-ana',
+      customerId: custAna.id,
+      balanceCents: 2500,
+    },
+  });
+
+  await prisma.walletTransaction.upsert({
+    where: { id: 'wtx-cashback-001' },
+    update: {},
+    create: {
+      id: 'wtx-cashback-001',
+      walletId: walletAna.id,
+      type: 'CREDIT',
+      amountCents: 2500,
+      reason: 'Cashback Promocional de Boas-Vindas iFastFood',
+      relatedOrderId: order1.id,
+    },
+  });
+
+  // 13. PLANOS DE ASSINATURA E ASSINATURAS DE CLIENTES (SubscriptionPlan, CustomerSubscription)
+  console.log('13. Gravando Planos e Assinaturas (SubscriptionPlan, CustomerSubscription)...');
+  const planPrime = await prisma.subscriptionPlan.upsert({
+    where: { slug: 'ifastfood-prime' },
+    update: {},
+    create: {
+      id: 'plan-prime-vip',
+      name: 'iFastFood Prime',
+      slug: 'ifastfood-prime',
+      priceCents: 1990,
+      perks: {
+        freeDeliveryMinCents: 3500,
+        exclusiveDiscountsPercent: 15,
+        prioritySupport: true,
+      },
+      active: true,
+    },
+  });
+
+  await prisma.customerSubscription.upsert({
+    where: { id: 'sub-ana-prime' },
+    update: {},
+    create: {
+      id: 'sub-ana-prime',
+      customerId: custAna.id,
+      planId: planPrime.id,
+      status: 'ACTIVE',
+      startedAt: new Date(Date.now() - 15 * 86400 * 1000),
+      nextBillingAt: new Date(Date.now() + 15 * 86400 * 1000),
+      gateway: 'STRIPE',
+      externalId: 'sub_stripe_prime_ana_123',
+    },
+  });
+
+  // 14. EQUIPE DO PARCEIRO (MerchantStaff)
+  console.log('14. Gravando Equipe de Lojistas (MerchantStaff)...');
+  const userGerenteBella = await prisma.user.upsert({
+    where: { email: 'gerente@bellanapoli.com.br' },
+    update: {},
+    create: {
+      id: 'user-staff-bella',
+      email: 'gerente@bellanapoli.com.br',
+      phone: '+5511999991122',
+      name: 'Fabio Bertolucci (Gerente)',
+      userType: 'MERCHANT_STAFF',
+      status: 'ACTIVE',
+    },
+  });
+
+  await prisma.merchantStaff.upsert({
+    where: {
+      merchantId_userId: {
+        merchantId: merchBella.id,
+        userId: userGerenteBella.id,
+      },
+    },
+    update: {},
+    create: {
+      id: 'staff-bella-01',
+      merchantId: merchBella.id,
+      userId: userGerenteBella.id,
+      role: 'MANAGER',
+    },
+  });
+
+  // 15. GRUPOS DE OPCIONAIS E ITENS (ProductOptionGroup, ProductOption)
+  console.log('15. Gravando Grupos de Opcionais (ProductOptionGroup, ProductOption)...');
+  const pogBorda = await prisma.productOptionGroup.upsert({
+    where: { id: 'pog-margherita-borda' },
+    update: {},
+    create: {
+      id: 'pog-margherita-borda',
+      productId: 'prod-margherita',
+      name: 'Escolha a Borda Recheada',
+      minSelect: 0,
+      maxSelect: 1,
+      required: false,
+      position: 1,
+    },
+  });
+
+  await prisma.productOption.upsert({
+    where: { id: 'opt-catupiry' },
+    update: {},
+    create: {
+      id: 'opt-catupiry',
+      groupId: pogBorda.id,
+      name: 'Catupiry Original',
+      priceDeltaCents: 600,
+      active: true,
+      position: 1,
+    },
+  });
+
+  await prisma.productOption.upsert({
+    where: { id: 'opt-cheddar' },
+    update: {},
+    create: {
+      id: 'opt-cheddar',
+      groupId: pogBorda.id,
+      name: 'Cheddar Cremoso',
+      priceDeltaCents: 600,
+      active: true,
+      position: 2,
+    },
+  });
+
+  const pogPontoCarne = await prisma.productOptionGroup.upsert({
+    where: { id: 'pog-calabresa-tipo' },
+    update: {},
+    create: {
+      id: 'pog-calabresa-tipo',
+      productId: 'prod-calabresa',
+      name: 'Preparo da Cebola',
+      minSelect: 1,
+      maxSelect: 1,
+      required: true,
+      position: 1,
+    },
+  });
+
+  await prisma.productOption.upsert({
+    where: { id: 'opt-cebola-caramelizada' },
+    update: {},
+    create: {
+      id: 'opt-cebola-caramelizada',
+      groupId: pogPontoCarne.id,
+      name: 'Cebola Roxa Caramelizada',
+      priceDeltaCents: 0,
+      active: true,
+      position: 1,
+    },
+  });
+
+  await prisma.productOption.upsert({
+    where: { id: 'opt-sem-cebola' },
+    update: {},
+    create: {
+      id: 'opt-sem-cebola',
+      groupId: pogPontoCarne.id,
+      name: 'Sem Cebola',
+      priceDeltaCents: 0,
+      active: true,
+      position: 2,
+    },
+  });
+
+  // 16. RESGATES DE CUPONS (CouponRedemption)
+  console.log('16. Gravando Resgates de Cupom (CouponRedemption)...');
+  const couponBemVindo = await prisma.coupon.findUnique({ where: { code: 'BEMVINDO10' } });
+  if (couponBemVindo) {
+    await prisma.couponRedemption.upsert({
+      where: {
+        couponId_orderId: {
+          couponId: couponBemVindo.id,
+          orderId: order1.id,
+        },
+      },
+      update: {},
+      create: {
+        id: 'redemption-ord1',
+        couponId: couponBemVindo.id,
+        orderId: order1.id,
+        customerId: custAna.id,
+        discountCents: 549,
+      },
+    });
+  }
+
+  // 17. OPCIONAIS ESCOLHIDOS NO PEDIDO (OrderItemOption)
+  console.log('17. Gravando Opcionais do Item do Pedido (OrderItemOption)...');
+  const order1Item = await prisma.orderItem.findFirst({
+    where: { orderId: order1.id },
+  });
+  if (order1Item) {
+    await prisma.orderItemOption.upsert({
+      where: { id: 'itemopt-ord1-borda' },
+      update: {},
+      create: {
+        id: 'itemopt-ord1-borda',
+        orderItemId: order1Item.id,
+        groupName: 'Escolha a Borda Recheada',
+        optionName: 'Catupiry Original',
+        priceDeltaCents: 600,
+      },
+    });
+  }
+
+  // 18. TRILHA DE EVENTOS DE ESTADO DO PEDIDO (OrderEventOrderState)
+  console.log('18. Gravando Trilha de Eventos do Pedido (OrderEventOrderState)...');
+  const eventCount = await prisma.orderEventOrderState.count({ where: { orderId: order1.id } });
+  if (eventCount === 0) {
+    await prisma.orderEventOrderState.createMany({
+      data: [
+        {
+          orderId: order1.id,
+          fromStatus: null,
+          toStatus: 'CREATED',
+          actorType: 'CUSTOMER',
+          actorUserId: userAna.id,
+          payload: { source: 'WEB_CHECKOUT' },
+          createdAt: new Date(Date.now() - 3600 * 2000),
+        },
+        {
+          orderId: order1.id,
+          fromStatus: 'CREATED',
+          toStatus: 'CONFIRMED',
+          actorType: 'MERCHANT',
+          actorUserId: userGerenteBella.id,
+          payload: { autoAccept: true },
+          createdAt: new Date(Date.now() - 3500 * 2000),
+        },
+        {
+          orderId: order1.id,
+          fromStatus: 'CONFIRMED',
+          toStatus: 'PREPARING',
+          actorType: 'MERCHANT',
+          createdAt: new Date(Date.now() - 3300 * 2000),
+        },
+        {
+          orderId: order1.id,
+          fromStatus: 'PREPARING',
+          toStatus: 'READY',
+          actorType: 'MERCHANT',
+          createdAt: new Date(Date.now() - 2500 * 2000),
+        },
+        {
+          orderId: order1.id,
+          fromStatus: 'READY',
+          toStatus: 'DISPATCHED',
+          actorType: 'COURIER',
+          actorUserId: userCarlos.id,
+          createdAt: new Date(Date.now() - 2000 * 2000),
+        },
+        {
+          orderId: order1.id,
+          fromStatus: 'DISPATCHED',
+          toStatus: 'DELIVERED',
+          actorType: 'COURIER',
+          actorUserId: userCarlos.id,
+          payload: { pinValidated: true, pin: '7492' },
+          createdAt: new Date(Date.now() - 3600 * 1000),
+        },
+      ],
+    });
+  }
+
+  // 19. REEMBOLSOS (Refund)
+  console.log('19. Gravando Reembolsos e Ajustes (Refund)...');
+  const payment2 = await prisma.payment.findUnique({
+    where: { orderId: order2.id },
+  });
+  if (payment2) {
+    await prisma.refund.upsert({
+      where: { id: 'ref-seed-001' },
+      update: {},
+      create: {
+        id: 'ref-seed-001',
+        paymentId: payment2.id,
+        amountCents: 500,
+        reason: 'Compensação por atraso moderado na cozinha',
+        status: 'COMPLETED',
+        externalId: 're_stripe_seed_test_500',
+        completedAt: new Date(Date.now() - 1800 * 1000),
+      },
+    });
+  }
+
+  // 20. LOTES DE REPASSE E ITENS CONCILIADOS (Payout, PayoutItem)
+  console.log('20. Gravando Lotes de Repasse (Payout, PayoutItem)...');
+  await prisma.payout.upsert({
+    where: {
+      merchantId_periodStart_periodEnd: {
+        merchantId: merchBella.id,
+        periodStart: new Date('2026-11-01T00:00:00Z'),
+        periodEnd: new Date('2026-11-07T23:59:59Z'),
+      },
+    },
+    update: {},
+    create: {
+      id: 'payout-bella-001',
+      merchantId: merchBella.id,
+      periodStart: new Date('2026-11-01T00:00:00Z'),
+      periodEnd: new Date('2026-11-07T23:59:59Z'),
+      grossCents: 5490,
+      commissionCents: 659,
+      processingFeeCents: 160,
+      monthlyFeeCents: 0,
+      netCents: 4671,
+      status: 'PAID',
+      externalId: 'po_stripe_bella_nov_w1',
+      paidAt: new Date('2026-11-08T12:00:00Z'),
+      items: {
+        create: {
+          id: 'poi-bella-001',
+          orderId: order1.id,
+          orderItemsCents: 5490,
+          orderDeliveryCents: 0,
+          commissionCents: 659,
+          processingFeeCents: 160,
+          netCents: 4671,
+        },
+      },
+    },
+  });
+
+  // 21. FATURAS MENSAIS (Invoice)
+  console.log('21. Gravando Faturas Mensais (Invoice)...');
+  await prisma.invoice.upsert({
+    where: { id: 'inv-burger-nov-2026' },
+    update: {},
+    create: {
+      id: 'inv-burger-nov-2026',
+      merchantId: merchBurger.id,
+      type: 'MONTHLY_FEE',
+      periodStart: new Date('2026-11-01T00:00:00Z'),
+      periodEnd: new Date('2026-11-30T23:59:59Z'),
+      amountCents: 10000,
+      status: 'PAID',
+      issuedAt: new Date('2026-11-01T08:00:00Z'),
+      paidAt: new Date('2026-11-05T14:30:00Z'),
+    },
+  });
+
+  // 22. CHAMADOS E MENSAGENS DE SUPORTE (SupportTicket, TicketMessage)
+  console.log('22. Gravando Chamados de Suporte (SupportTicket, TicketMessage)...');
+  await prisma.supportTicket.upsert({
+    where: { id: 'ticket-cust-cupom' },
+    update: {},
+    create: {
+      id: 'ticket-cust-cupom',
+      persona: 'CUSTOMER',
+      subject: 'Dúvida sobre cupom PRIMEIRACOMPRA e pagamento via PIX',
+      userId: userAna.id,
+      orderId: order1.id,
+      status: 'RESOLVED',
+      priority: 'NORMAL',
+      resolvedAt: new Date(),
+      messages: {
+        createMany: {
+          data: [
+            {
+              id: 'msg-ticket-1-01',
+              authorUserId: userAna.id,
+              authorType: 'CUSTOMER',
+              body: 'Olá! Gostaria de saber se o cupom PRIMEIRACOMPRA pode ser combinado com pagamento por PIX no checkout.',
+              internal: false,
+            },
+            {
+              id: 'msg-ticket-1-02',
+              authorUserId: adminUser.id,
+              authorType: 'STAFF',
+              body: 'Olá Ana! Sim, os cupons são válidos para todas as modalidades de pagamento online (PIX e Cartão de Crédito). Aproveite!',
+              internal: false,
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const userGerenteBellaRef = await prisma.user.findUnique({ where: { email: 'gerente@bellanapoli.com.br' } });
+  if (userGerenteBellaRef) {
+    await prisma.supportTicket.upsert({
+      where: { id: 'ticket-merch-raio' },
+      update: {},
+      create: {
+        id: 'ticket-merch-raio',
+        persona: 'MERCHANT',
+        subject: 'Expansão de raio de atendimento para finais de semana',
+        userId: userGerenteBellaRef.id,
+        merchantId: merchBella.id,
+        status: 'OPEN',
+        priority: 'HIGH',
+        messages: {
+          create: {
+            id: 'msg-ticket-2-01',
+            authorUserId: userGerenteBellaRef.id,
+            authorType: 'MERCHANT',
+            body: 'Gostaríamos de expandir nosso raio de entrega para 8.5 km às sextas e sábados à noite.',
+            internal: false,
+          },
+        },
+      },
+    });
+  }
+
+  // 23. NOTIFICAÇÕES (Notification)
+  console.log('23. Gravando Notificações (Notification)...');
+  await prisma.notification.upsert({
+    where: { id: 'notif-ana-pedido-entregue' },
+    update: {},
+    create: {
+      id: 'notif-ana-pedido-entregue',
+      userId: userAna.id,
+      channel: 'PUSH',
+      title: 'Seu pedido foi entregue!',
+      body: 'Carlos Eduardo entregou sua Pizza Calabresa Artesanal. Bom apetite!',
+      sentAt: new Date(Date.now() - 3600 * 1000),
+      readAt: new Date(Date.now() - 3500 * 1000),
+      payload: { orderId: order1.id, code: 'IF-9812A' },
+    },
+  });
+
+  await prisma.notification.upsert({
+    where: { id: 'notif-carlos-gorjeta' },
+    update: {},
+    create: {
+      id: 'notif-carlos-gorjeta',
+      userId: userCarlos.id,
+      channel: 'PUSH',
+      title: 'Entrega finalizada com sucesso!',
+      body: 'Você recebeu R$ 5,90 pela entrega do pedido IF-9812A.',
+      sentAt: new Date(Date.now() - 3600 * 1000),
+      readAt: new Date(Date.now() - 3550 * 1000),
+      payload: { orderId: order1.id, feeCourierCents: 590 },
+    },
+  });
+
+  // 24. EVENTOS DE WEBHOOK IDEMPOTENTES (WebhookEvent)
+  console.log('24. Gravando Eventos de Webhook Idempotentes (WebhookEvent)...');
+  await prisma.webhookEvent.upsert({
+    where: {
+      gateway_externalId: {
+        gateway: 'STRIPE',
+        externalId: 'evt_stripe_seed_order1_succeeded',
+      },
+    },
+    update: {},
+    create: {
+      id: 'wh-seed-stripe-001',
+      gateway: 'STRIPE',
+      externalId: 'evt_stripe_seed_order1_succeeded',
+      payload: {
+        id: 'evt_stripe_seed_order1_succeeded',
+        type: 'payment_intent.succeeded',
+        created: Math.floor(Date.now() / 1000) - 7200,
+        data: {
+          object: {
+            id: 'pi_seed_stripe_001',
+            amount: 6279,
+            currency: 'brl',
+            status: 'succeeded',
+          },
+        },
+      },
+      processedAt: new Date(Date.now() - 3600 * 2000),
+    },
+  });
+
   console.log('--- Seed Completo no Supabase Finalizado com Sucesso! ---');
 }
 
