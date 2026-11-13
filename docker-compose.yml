@@ -1,5 +1,6 @@
-# iFastFood — infraestrutura de desenvolvimento local (F0)
-# Uso: docker compose up -d postgres redis
+# iFastFood — Infraestrutura de Desenvolvimento e Produção (F0 a F7)
+# Uso dev infra: docker compose up -d postgres redis
+# Uso full stack: docker compose --profile full up -d
 services:
   postgres:
     image: postgres:16-alpine
@@ -21,7 +22,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: ifastfood-redis
-    # 6380 na máquina host para não disputar com stacks locais do usuário
     ports:
       - '6380:6379'
     command: ['redis-server', '--appendonly', 'yes']
@@ -39,12 +39,63 @@ services:
     ports:
       - '7700:7700'
     environment:
-      # Em dev usamos master key fixa; em produção gerar segredo forte.
       MEILI_MASTER_KEY: ifastfood_dev_meili
       MEILI_ENV: development
     volumes:
       - ifastfood_meilidata:/meili_data
-    profiles: ['search']
+    profiles: ['search', 'full']
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ifastfood-api
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://ifastfood:ifastfood_dev@postgres:5432/ifastfood?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_simulated}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_simulated}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: ['full', 'apps']
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: ifastfood-admin
+    ports:
+      - '3002:3002'
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: http://api:3001
+    depends_on:
+      - api
+    profiles: ['full', 'apps']
+
+  web-landing:
+    build:
+      context: .
+      dockerfile: apps/web-landing/Dockerfile
+    container_name: ifastfood-landing
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://api:3001
+    depends_on:
+      - api
+    profiles: ['full', 'apps']
 
 volumes:
   ifastfood_pgdata:

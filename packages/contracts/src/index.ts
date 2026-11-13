@@ -11,3 +11,4 @@ export * from './courier';
 export * from './logistics';
 export * from './finance';
 export * from './engagement';
+export * from './cms';

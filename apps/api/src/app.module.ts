@@ -15,6 +15,7 @@ import { FinanceModule } from './finance/finance.module';
 import { MarketingModule } from './marketing/marketing.module';
 import { RatingModule } from './rating/rating.module';
 import { SupportModule } from './support/support.module';
+import { CmsModule } from './cms/cms.module';
 
 /**
  * Monólito modular — os módulos de domínio entram aqui por fase:
@@ -23,7 +24,8 @@ import { SupportModule } from './support/support.module';
  *   F3 CustomerModule, DiscoveryModule, PaymentsModule, OrdersModule
  *   F4 LogisticsModule, CourierModule
  *   F5 FinanceModule, AdminModule
- *   F6 MarketingModule, SupportModule
+ *   F6 MarketingModule, RatingModule, SupportModule
+ *   F7 CmsModule
  */
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { SupportModule } from './support/support.module';
     MarketingModule,
     RatingModule,
     SupportModule,
+    CmsModule,
   ],
 })
 export class AppModule {}

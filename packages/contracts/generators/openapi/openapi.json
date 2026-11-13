@@ -1172,6 +1172,67 @@
           "Support"
         ]
       }
+    },
+    "/cms/pages": {
+      "get": {
+        "operationId": "CmsController_listPages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de páginas publicadas"
+          }
+        },
+        "summary": "Lista todas as páginas CMS públicas ativas",
+        "tags": [
+          "CMS & Institucional"
+        ]
+      },
+      "post": {
+        "operationId": "CmsController_upsertPage",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Página salva com sucesso"
+          }
+        },
+        "summary": "Cria ou atualiza uma página institucional (Admin / Seed)",
+        "tags": [
+          "CMS & Institucional"
+        ]
+      }
+    },
+    "/cms/pages/{slug}": {
+      "get": {
+        "operationId": "CmsController_getPage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Conteúdo da página e blocos de seções"
+          },
+          "404": {
+            "description": "Página não encontrada ou despublicada"
+          }
+        },
+        "summary": "Obtém conteúdo de uma página institucional pelo slug",
+        "tags": [
+          "CMS & Institucional"
+        ]
+      }
+    },
+    "/cms/leads": {
+      "post": {
+        "operationId": "CmsController_captureLead",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Lead recebido com sucesso"
+          }
+        },
+        "summary": "Captura lead comercial ou de interesse de entregador/restaurante",
+        "tags": [
+          "CMS & Institucional"
+        ]
+      }
     }
   },
   "info": {
