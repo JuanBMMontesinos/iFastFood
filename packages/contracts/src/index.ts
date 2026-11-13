@@ -7,3 +7,5 @@ export * from './customer';
 export * from './discovery';
 export * from './payments';
 export * from './orders';
+export * from './courier';
+export * from './logistics';

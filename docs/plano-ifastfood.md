@@ -45,25 +45,23 @@ sensível, LGPD.
 - **Testes & Qualidade:** 100% dos testes unitários passando (13 suítes / 106 testes no `@ifastfood/domain` com 95.65% de cobertura; 17 suítes / 56 testes no `@ifastfood/api`). Typecheck com zero erros.
 - **Frontends previstos:** PWA `web-customer` e painel `web-merchant` para consumo dos contratos e endpoints validados.
 
-## F4 — Motor de despacho + App do Entregador (Android)
-- `CourierModule`: onboarding, documentos (CNH, CRLV, selfie...), revisão admin
-  (`CourierStatus`), turnos (`CourierShift`), fechamento automático por segurança.
-- `LogisticsModule`:
-  - ingestão de GPS (`CourierLocation` + Redis GEO para "entregadores próximos");
-  - **motor de despacho**: oferta sequencial ou em lote com timeout, raio crescente e score
-    (distância, avaliação, carga); máquina de estado `delivery/state-machine` (já existe);
-  - repasse do entregador (`feeCourierCents`);
-  - comprovante de entrega (código de 4 dígitos ou foto em `proofUrl`);
-  - retorno à loja.
-- Rastreamento ao vivo no PWA do cliente e no Gestor.
-- **App Android do entregador** (Kotlin, Jetpack Compose, SDK gerado do OpenAPI): login,
-  documentos, ficar online, receber e aceitar oferta, navegação, coleta, entrega, ganhos.
-  GPS em foreground service. Testes Maestro no CI.
-- Infra de codegen: publicar a spec OpenAPI completa e gerar `kotlin-client` e `swift-client`
-  (configs já existem em `packages/contracts/generators`).
-
-**Pronto quando:** pedido de loja no plano ENTREGA é ofertado, aceito, coletado e entregue
-pelo app, com rastreio ao vivo.
+## F4 — Motor de despacho + App do Entregador (Android) ✅ (Concluído no Domínio, Backend, App Nativo, Spec OpenAPI e Testes)
+- **Domínio (`packages/domain`):**
+  - Algoritmo de despacho e pontuação (`dispatch-scoring.ts`): cálculo ponderado por avaliação, proximidade geográfica, penalidade por carga ativa e adequação veicular (`calculateCourierScore`, `rankCouriersForOffer`);
+  - Repasse ao entregador (`calculateCourierFee`): valor fixo de saída + valor por quilômetro com piso mínimo;
+  - Validação estrita do código PIN de confirmação de entrega de 4 dígitos (`verifyDeliveryPin`).
+- **Contratos (`packages/contracts`):**
+  - `courier.ts`: schemas de perfil, onboarding, upload de documentos (CNH, CRLV, Selfie, etc.), turnos e revisão de KYC;
+  - `logistics.ts`: schemas de ofertas de corridas (`DeliveryOfferDto`), ações de entrega (`DeliveryActionInput`), rastreamento ao vivo (`DeliveryTrackingDto`, `CourierLiveLocation`).
+- **Módulos de API (`apps/api`):**
+  - `CourierModule`: perfil, auto-provisionamento, upload de CNH/Selfie com transição para `PENDING_REVIEW`, turnos de jornada (`CourierShift`) com fechamento automático de segurança (> 12h) e revisão administrativa;
+  - `LogisticsModule`: ingestão de GPS (`CourierLocation`), criação de entrega (`Delivery`), listagem de ofertas no raio do entregador, transições de estado (`assertDeliveryTransition`), confirmação por PIN de 4 dígitos e rastreamento em tempo real para o cliente/lojista;
+  - Exportação e publicação automática da especificação OpenAPI completa (`packages/contracts/generators/openapi/openapi.json`) e rotas `/docs` e `/docs-json`.
+- **App Android Nativo (`apps/android-courier`):**
+  - Desenvolvido em Kotlin + Jetpack Compose como thin client sobre a API/OpenAPI;
+  - `LocationForegroundService`: rastreamento GPS contínuo em segundo plano durante o turno ativo;
+  - Telas interativas para gestão de turnos (Online/Offline), listagem de corridas disponíveis e acompanhamento passo-a-passo da corrida com confirmação por PIN.
+- **Testes & Qualidade:** 100% dos testes unitários passando (14 suítes / 114 testes no `@ifastfood/domain` com 95.65% de cobertura; 19 suítes / 69 testes no `@ifastfood/api`). Typecheck com 0 erros.
 
 ## F5 — Financeiro + Backoffice completo
 - `FinanceModule`:

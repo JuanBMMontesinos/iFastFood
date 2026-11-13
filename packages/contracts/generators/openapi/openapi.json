@@ -1,0 +1,1055 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/customers/signup": {
+      "post": {
+        "operationId": "AuthController_signup",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/otp/request": {
+      "post": {
+        "operationId": "OtpController_request",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Otp"
+        ]
+      }
+    },
+    "/auth/otp/verify": {
+      "post": {
+        "operationId": "OtpController_verify",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Otp"
+        ]
+      }
+    },
+    "/auth/2fa/setup": {
+      "post": {
+        "operationId": "TwoFactorController_setup",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TwoFactor"
+        ]
+      }
+    },
+    "/auth/2fa/enable": {
+      "post": {
+        "operationId": "TwoFactorController_enable",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TwoFactor"
+        ]
+      }
+    },
+    "/auth/2fa/disable": {
+      "post": {
+        "operationId": "TwoFactorController_disable",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TwoFactor"
+        ]
+      }
+    },
+    "/account/export": {
+      "post": {
+        "operationId": "AccountController_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/anonymize": {
+      "post": {
+        "operationId": "AccountController_anonymize",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "operationId": "AdminUsersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminUsers"
+        ]
+      },
+      "post": {
+        "operationId": "AdminUsersController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminUsers"
+        ]
+      }
+    },
+    "/admin/users/roles": {
+      "get": {
+        "operationId": "AdminUsersController_roles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminUsers"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthController_live",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "HealthController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/partners/signup": {
+      "post": {
+        "operationId": "PartnersController_signup",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me": {
+      "get": {
+        "operationId": "PartnersController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      },
+      "put": {
+        "operationId": "PartnersController_updateProfile",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/hours": {
+      "get": {
+        "operationId": "PartnersController_hours",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      },
+      "put": {
+        "operationId": "PartnersController_setHours",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/open-now": {
+      "get": {
+        "operationId": "PartnersController_openNow",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/zones": {
+      "post": {
+        "operationId": "PartnersController_createZone",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/zones/{zoneId}": {
+      "put": {
+        "operationId": "PartnersController_updateZone",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      },
+      "delete": {
+        "operationId": "PartnersController_deleteZone",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/kyc": {
+      "post": {
+        "operationId": "PartnersController_submitKyc",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/staff": {
+      "post": {
+        "operationId": "PartnersController_inviteStaff",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/me/staff/{userId}": {
+      "delete": {
+        "operationId": "PartnersController_removeStaff",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/admin/partners": {
+      "get": {
+        "operationId": "AdminPartnersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}": {
+      "get": {
+        "operationId": "AdminPartnersController_detail",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}/review": {
+      "post": {
+        "operationId": "AdminPartnersController_review",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}/contract": {
+      "put": {
+        "operationId": "AdminPartnersController_upsertContract",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}/status": {
+      "post": {
+        "operationId": "AdminPartnersController_statusAction",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}/block": {
+      "post": {
+        "operationId": "AdminPartnersController_block",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/admin/partners/{id}/unblock": {
+      "post": {
+        "operationId": "AdminPartnersController_unblock",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminPartners"
+        ]
+      }
+    },
+    "/catalog/merchants/{merchantId}/menu": {
+      "get": {
+        "operationId": "CatalogController_getPublicMenuTree",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/tree": {
+      "get": {
+        "operationId": "CatalogController_getMyMenuTree",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/categories": {
+      "post": {
+        "operationId": "CatalogController_createCategory",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/categories/reorder": {
+      "put": {
+        "operationId": "CatalogController_reorderCategories",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/categories/{categoryId}": {
+      "put": {
+        "operationId": "CatalogController_updateCategory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      },
+      "delete": {
+        "operationId": "CatalogController_deleteCategory",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/categories/{categoryId}/products": {
+      "post": {
+        "operationId": "CatalogController_createProduct",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/categories/{categoryId}/products/reorder": {
+      "put": {
+        "operationId": "CatalogController_reorderProducts",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/products/{productId}": {
+      "put": {
+        "operationId": "CatalogController_updateProduct",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      },
+      "delete": {
+        "operationId": "CatalogController_deleteProduct",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/products/{productId}/toggle-pause": {
+      "post": {
+        "operationId": "CatalogController_toggleProductPause",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/products/{productId}/option-groups": {
+      "post": {
+        "operationId": "CatalogController_createOptionGroup",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/partners/me/menu/option-groups/{groupId}": {
+      "delete": {
+        "operationId": "CatalogController_deleteOptionGroup",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/customer/me": {
+      "get": {
+        "operationId": "CustomerController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      },
+      "put": {
+        "operationId": "CustomerController_updateProfile",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      }
+    },
+    "/customer/addresses": {
+      "get": {
+        "operationId": "CustomerController_listAddresses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      },
+      "post": {
+        "operationId": "CustomerController_createAddress",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      }
+    },
+    "/customer/addresses/{addressId}": {
+      "put": {
+        "operationId": "CustomerController_updateAddress",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      },
+      "delete": {
+        "operationId": "CustomerController_deleteAddress",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      }
+    },
+    "/customer/addresses/{addressId}/default": {
+      "post": {
+        "operationId": "CustomerController_setDefaultAddress",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Customer"
+        ]
+      }
+    },
+    "/discovery/feed": {
+      "get": {
+        "operationId": "DiscoveryController_feed",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Discovery"
+        ]
+      }
+    },
+    "/discovery/merchants/{idOrSlug}": {
+      "get": {
+        "operationId": "DiscoveryController_merchantDetail",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Discovery"
+        ]
+      }
+    },
+    "/payments/webhooks/stripe": {
+      "post": {
+        "operationId": "PaymentsController_handleStripeWebhook",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/orders/checkout": {
+      "post": {
+        "operationId": "OrdersController_checkout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/me": {
+      "get": {
+        "operationId": "OrdersController_myOrders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "operationId": "OrdersController_orderDetail",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/orders/{id}/action": {
+      "post": {
+        "operationId": "OrdersController_customerAction",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/partners/me/orders": {
+      "get": {
+        "operationId": "PartnerOrdersController_listActiveOrders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "PartnerOrders"
+        ]
+      }
+    },
+    "/partners/me/orders/{id}/action": {
+      "post": {
+        "operationId": "PartnerOrdersController_statusAction",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "PartnerOrders"
+        ]
+      }
+    },
+    "/couriers/me": {
+      "get": {
+        "operationId": "CourierController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/couriers/onboard": {
+      "post": {
+        "operationId": "CourierController_onboard",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/couriers/me/documents": {
+      "post": {
+        "operationId": "CourierController_uploadDocument",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/couriers/me/shift/start": {
+      "post": {
+        "operationId": "CourierController_startShift",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/couriers/me/shift/end": {
+      "post": {
+        "operationId": "CourierController_endShift",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/couriers/admin/{id}/review": {
+      "patch": {
+        "operationId": "CourierController_reviewCourier",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courier"
+        ]
+      }
+    },
+    "/logistics/couriers/me/location": {
+      "post": {
+        "operationId": "LogisticsController_updateLocation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Logistics"
+        ]
+      }
+    },
+    "/logistics/couriers/me/offers": {
+      "get": {
+        "operationId": "LogisticsController_getOffers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Logistics"
+        ]
+      }
+    },
+    "/logistics/couriers/me/deliveries/{id}/action": {
+      "post": {
+        "operationId": "LogisticsController_executeAction",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Logistics"
+        ]
+      }
+    },
+    "/logistics/orders/{orderId}/tracking": {
+      "get": {
+        "operationId": "LogisticsController_getTracking",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Logistics"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "iFastFood API",
+    "description": "API Marketplace Delivery iFastFood — Especificação OpenAPI para SDKs nativos e web",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {}
+  }
+}

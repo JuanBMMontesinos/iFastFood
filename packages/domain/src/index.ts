@@ -8,6 +8,7 @@ export * from './order/pricing';
 export * from './delivery/state-machine';
 export * from './geo/haversine';
 export * from './logistics/delivery-fee';
+export * from './logistics/dispatch-scoring';
 export * from './marketing/coupon';
 export * from './partner/state-machine';
 export * from './partner/hours';
