@@ -49,6 +49,16 @@ import { AdminUsersController } from './http/admin/users.controller';
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
   ],
-  exports: [TokenService, AuditService, FieldCipher, RateLimiterService],
+  exports: [
+    PasswordService,
+    SessionService,
+    TokenService,
+    AuditService,
+    FieldCipher,
+    RateLimiterService,
+    OtpService,
+    TotpService,
+    AuthService,
+  ],
 })
 export class IdentityModule {}
