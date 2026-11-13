@@ -47,14 +47,13 @@ export function LeadCaptureForm({ type, title, subtitle }: LeadCaptureFormProps)
         setPhone('');
         setCity('');
       } else {
-        // Fallback gracioso se a API não estiver rodando no mesmo host
-        setStatus('success');
-        setFeedback('Seus dados foram enviados com sucesso! Nossa equipe entrará em contato em até 24 horas.');
+        const errJson = await res.json().catch(() => null);
+        setStatus('error');
+        setFeedback(errJson?.message || 'Falha ao registrar seu interesse. Tente novamente mais tarde.');
       }
     } catch (err) {
-      // Fallback em caso de offline/preview
-      setStatus('success');
-      setFeedback('Cadastro registrado com sucesso! Nossa equipe entrará em contato em breve.');
+      setStatus('error');
+      setFeedback('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -64,6 +63,13 @@ export function LeadCaptureForm({ type, title, subtitle }: LeadCaptureFormProps)
     <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-100">
       {title && <h3 className="text-xl font-bold text-slate-900 mb-1">{title}</h3>}
       {subtitle && <p className="text-sm text-slate-500 mb-6">{subtitle}</p>}
+
+      {status === 'error' && (
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-red-700">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
+          <span>{feedback}</span>
+        </div>
+      )}
 
       {status === 'success' ? (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center">

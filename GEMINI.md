@@ -6,6 +6,7 @@ Este projeto possui planejamento arquitetural e de fases versionado diretamente 
 - Plano mestre: `docs/plano-ifastfood.md`
 - ADRs: `docs/adr/`
 - Skill de planejamento: `.agents/skills/project-planning/SKILL.md`
+- Skill de zero mocks: `.agents/skills/database-driven-zero-mocks/SKILL.md`
 
 ## Diretrizes de Execução
 1. **Preservação de Contexto:** Sempre atualize `docs/plano-ifastfood.md` ao implementar ou concluir tarefas de qualquer fase (F0 até F7). Nunca deixe o planejamento se perder.
@@ -20,3 +21,7 @@ Este projeto possui planejamento arquitetural e de fases versionado diretamente 
 4. **Convenções de Domínio:**
    - Valores monetários em centavos inteiros (`MoneyCents`). Taxas em basis points (`bps`).
    - Regras de negócio em `packages/domain` com testes (Vitest ≥ 85% cobertura).
+5. **Zero Mocks & Dados 100% Supabase:**
+   - Proibido qualquer dado mockado ou chumbado em HTML, componentes React (TSX), arquivos TS ou TXT.
+   - Todos os dados de exemplo, métricas executivas, filas de KYC, lançamentos do ledger, cupons e páginas CMS devem ser lidos dinamicamente de suas respectivas tabelas no Supabase via API NestJS.
+   - Todos os dados semente devem ser populados diretamente no Supabase via `apps/api/prisma/seed.ts`.

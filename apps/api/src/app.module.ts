@@ -16,6 +16,7 @@ import { MarketingModule } from './marketing/marketing.module';
 import { RatingModule } from './rating/rating.module';
 import { SupportModule } from './support/support.module';
 import { CmsModule } from './cms/cms.module';
+import { AdminModule } from './admin/admin.module';
 
 /**
  * Monólito modular — os módulos de domínio entram aqui por fase:
@@ -46,6 +47,7 @@ import { CmsModule } from './cms/cms.module';
     RatingModule,
     SupportModule,
     CmsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

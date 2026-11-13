@@ -4,6 +4,7 @@ import {
   CmsPageDto,
   LeadCaptureInput,
   LeadCaptureResponse,
+  PlatformStatsDto,
   UpsertCmsPageInput,
 } from '@ifastfood/contracts';
 import { CmsService } from './cms.service';
@@ -12,6 +13,13 @@ import { CmsService } from './cms.service';
 @Controller('cms')
 export class CmsController {
   constructor(private readonly cmsService: CmsService) {}
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Obtém estatísticas operacionais públicas calculadas do Supabase' })
+  @ApiResponse({ status: 200, description: 'Estatísticas de entregas, avaliações e parceiros' })
+  async getStats(): Promise<PlatformStatsDto> {
+    return this.cmsService.getPlatformStats();
+  }
 
   @Get('pages')
   @ApiOperation({ summary: 'Lista todas as páginas CMS públicas ativas' })

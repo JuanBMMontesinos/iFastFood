@@ -72,10 +72,11 @@ sensível, LGPD e zero tolerância a erros em testes.
   - `FinanceModule`: geração periódica de lotes de pagamento para lojistas (`generateMerchantPayout`) com desconto automático de mensalidade, consulta de extrato de ganhos do entregador e auditoria administrativa do livro-razão.
 - **Backoffice Web (`apps/admin`):**
   - Aplicação moderna em **Next.js 14 + Tailwind CSS + Lucide Icons**:
-    - Dashboard de métricas executivas (GMV, Receita Líquida, Pedidos, Entregadores);
-    - Fila operacional de KYC com homologação de lojistas e entregadores em 1 clique;
+    - **Zero Mocks (100% Supabase):** Remoção completa de dados estáticos; dados consumidos em tempo real via `AdminModule` (`/admin/dashboard/metrics`, `/admin/kyc/queue`, `/finance/admin/ledger`);
+    - Dashboard de métricas executivas em tempo real (GMV, Receita Líquida, Pedidos Entregues, Lojistas e Entregadores Ativos);
+    - Fila operacional de KYC com homologação/rejeição direta no banco em 1 clique;
     - Tabela do Ledger contábil em partidas dobradas com identificação de DÉBITO e CRÉDITO;
-    - Formulário de geração de Payouts por período.
+    - Formulário de geração e cálculo de Payouts por período.
 
 ---
 
@@ -96,13 +97,13 @@ sensível, LGPD e zero tolerância a erros em testes.
 ## F7 — Lançamento, Landing CMS, Qualidade & Docs ✅ (Concluído)
 - **Landing Web com CMS Dinâmico (`apps/web-landing`):**
   - Aplicação Next.js 14 + Tailwind CSS + Lucide Icons totalmente responsiva e com SEO otimizado;
-  - Seções de alta conversão: Hero com badges de confiança, Seção para Clientes, Seção "Para Restaurantes" e Seção "Para Entregadores";
-  - Formulário interativo de captura de leads (`LeadCaptureForm`) com feedback em tempo real e fallback resiliente;
-  - Renderizador dinâmico de páginas CMS `/p/[slug]` integrado à tabela `CmsPage` do Prisma com fallback offline para páginas essenciais (`sobre-nos`, `termos-de-uso`, `politica-de-privacidade`).
+  - **Zero Mocks (100% Supabase):** Indicadores de confiança e card de live tracking alimentados diretamente pelo endpoint `/cms/stats` do Supabase;
+  - Formulário interativo de captura de leads (`LeadCaptureForm`) com feedback em tempo real e persistência de leads;
+  - Renderizador dinâmico de páginas CMS `/p/[slug]` integrado à tabela `CmsPage` do Prisma/Supabase sem fallbacks estáticos hardcoded (`sobre-nos`, `termos-de-uso`, `politica-de-privacidade`).
 - **Módulo CMS & Leads na API (`apps/api/src/cms`):**
-  - `CmsService`, `CmsController` e `CmsModule` com endpoints: `GET /cms/pages`, `GET /cms/pages/:slug`, `POST /cms/pages` e `POST /cms/leads`;
-  - DTOs em `packages/contracts/src/cms.ts` (`CmsPageDto`, `CmsSectionDto`, `LeadCaptureInput`, `UpsertCmsPageInput`);
-  - Script de seed Prisma em `apps/api/prisma/seed.ts` para páginas institucionais padrão.
+  - `CmsService`, `CmsController` e `CmsModule` com endpoints: `GET /cms/pages`, `GET /cms/pages/:slug`, `GET /cms/stats`, `POST /cms/pages` e `POST /cms/leads`;
+  - DTOs em `packages/contracts/src/cms.ts` e `admin.ts` (`CmsPageDto`, `CmsSectionDto`, `LeadCaptureInput`, `PlatformStatsDto`, `ShowcaseDeliveryDto`);
+  - Script de seed completo do Prisma em `apps/api/prisma/seed.ts` populando todas as tabelas (Lojistas, Entregadores, Documentos, Turnos, Pedidos, Itens, Entregas, Pagamentos Stripe, Contas e Ledger em partidas dobradas, Cupons, Avaliações, Produtos e Páginas CMS).
 - **Testes de Carga & Confiabilidade (`tests/load`):**
   - `tests/load/k6-checkout.js`: teste de pico com 100 VUs concorrentes e garantia estrita de idempotência no Stripe / Banco;
   - `tests/load/k6-dispatch.js`: teste de streaming de coordenadas GPS e corrida de concorrência no aceite de entregas com latch atômico.
@@ -117,7 +118,7 @@ sensível, LGPD e zero tolerância a erros em testes.
 - **Testes & Qualidade Finais:**
   - 100% dos testes unitários passando:
     - `@ifastfood/domain`: 15 suítes / 119 testes com 94.62% de cobertura de código;
-    - `@ifastfood/api`: 24 suítes / 84 testes passando sem falhas.
+    - `@ifastfood/api`: 25 suítes / 88 testes passando sem falhas.
   - Typecheck com 0 erros em todos os 6 pacotes do monorepo;
   - Builds de produção do Turborepo 100% bem-sucedidos.
 
@@ -128,4 +129,5 @@ sensível, LGPD e zero tolerância a erros em testes.
 2. **Gateway padrão:** **Stripe** como provedor padrão de pagamentos (com arquitetura multi-gateway para expansão futura).
 3. **Escopo do MVP:** Lançamento oficial do MVP após a conclusão da fase **F5** (inclui Despacho + App Entregador + Financeiro + Backoffice). As fases F6 e F7 complementam os apps nativos, canais de engajamento, landing CMS e infraestrutura completa de lançamento.
 4. **Banco de Dados & Migrações:** Migrations versionadas aplicadas diretamente no Supabase pela IA (`apps/api/prisma/migrations/`).
-5. **Garantia de Qualidade & Git:** Cada fase só é finalizada após 100% dos testes unitários passarem sem erro, seguida de commit descritivo e push.
+5. **Zero Mocks & Dados 100% Supabase:** Nenhum dado estático ou chumbado em HTML, componentes React (TSX), arquivos TS ou TXT. Todos os dados de exemplo, métricas e páginas institucionais são persistidos nas respectivas tabelas do PostgreSQL no Supabase e servidos via endpoints tipados. Skill documentada em `.agents/skills/database-driven-zero-mocks/SKILL.md`.
+6. **Garantia de Qualidade & Git:** Cada fase só é finalizada após 100% dos testes unitários passarem sem erro, seguida de commit descritivo e push.

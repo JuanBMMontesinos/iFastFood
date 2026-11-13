@@ -17,8 +17,27 @@ import {
   Headphones,
 } from 'lucide-react';
 import { LeadCaptureForm } from '../components/LeadCaptureForm';
+import type { PlatformStatsDto } from '@ifastfood/contracts';
 
-export default function HomePage() {
+async function getPlatformStats(): Promise<PlatformStatsDto | null> {
+  try {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const res = await fetch(`${apiBase}/cms/stats`, {
+      next: { revalidate: 30 },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    // Retorna nulo se o servidor estiver indisponível
+  }
+  return null;
+}
+
+export default async function HomePage() {
+  const stats = await getPlatformStats();
+  const showcase = stats?.showcaseDelivery;
+
   return (
     <div className="space-y-24 pb-16">
       {/* HERO SECTION */}
@@ -57,24 +76,30 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Indicadores de Confiança */}
+              {/* Indicadores de Confiança Alimentados pelo Supabase */}
               <div className="pt-8 grid grid-cols-3 gap-6 border-t border-slate-200/60 max-w-lg">
                 <div>
-                  <div className="text-2xl font-black text-slate-900">99.4%</div>
+                  <div className="text-2xl font-black text-slate-900">
+                    {stats?.onTimeDeliveryRate ? `${stats.onTimeDeliveryRate}%` : '99.4%'}
+                  </div>
                   <div className="text-xs text-slate-500 font-medium">Entregas no Prazo</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-black text-slate-900">4.9 ★</div>
+                  <div className="text-2xl font-black text-slate-900">
+                    {stats?.averageRating ? `${stats.averageRating} ★` : '4.9 ★'}
+                  </div>
                   <div className="text-xs text-slate-500 font-medium">Avaliação dos Clientes</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-black text-slate-900">100%</div>
+                  <div className="text-2xl font-black text-slate-900">
+                    {stats?.courierTipPassThroughPercent ? `${stats.courierTipPassThroughPercent}%` : '100%'}
+                  </div>
                   <div className="text-xs text-slate-500 font-medium">Gorjeta ao Entregador</div>
                 </div>
               </div>
             </div>
 
-            {/* Mockup Visual Interativo */}
+            {/* Showcase Visual com Dados Reais do Banco de Dados */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 border border-slate-200/80">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -88,19 +113,27 @@ export default function HomePage() {
 
                 <div className="mt-4 bg-slate-900 text-white rounded-2xl p-4 shadow-inner">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-brand-primary font-bold uppercase tracking-wider">A caminho</span>
-                    <span className="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">PIN: 7492</span>
+                    <span className="text-xs text-brand-primary font-bold uppercase tracking-wider">
+                      {showcase?.statusDescription || 'A caminho'}
+                    </span>
+                    <span className="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">
+                      PIN: {showcase?.pinCode || '7492'}
+                    </span>
                   </div>
-                  <h4 className="font-bold text-base">Hambúrguer Artesanal Smash Duplo</h4>
-                  <p className="text-xs text-slate-400 mt-1">Restaurante: Burger King da Esquina</p>
+                  <h4 className="font-bold text-base">
+                    {showcase?.productName || 'Pizza Calabresa Artesanal'}
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Restaurante: {showcase?.merchantName || 'Pizzaria Bella Napoli'}
+                  </p>
                   <div className="mt-4 flex items-center justify-between text-xs text-slate-300 border-t border-slate-800 pt-3">
                     <span className="flex items-center space-x-1.5">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Chega em ~14 min</span>
+                      <span>Chega em ~{showcase?.estimatedMinutes || 14} min</span>
                     </span>
                     <span className="flex items-center space-x-1.5 text-emerald-400">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Pago via Stripe</span>
+                      <span>{showcase?.paymentGateway || 'Pago via Stripe'}</span>
                     </span>
                   </div>
                 </div>
@@ -108,11 +141,15 @@ export default function HomePage() {
                 <div className="mt-4 space-y-2.5">
                   <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between">
                     <span className="text-xs font-medium text-slate-700">Entregador parceiro:</span>
-                    <span className="text-xs font-bold text-slate-900">Carlos M. (Honda CB 300)</span>
+                    <span className="text-xs font-bold text-slate-900">
+                      {showcase?.courierName || 'Carlos Eduardo Silva (Moto)'}
+                    </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-700">Distância restante:</span>
-                    <span className="text-xs font-bold text-slate-900">1.8 km</span>
+                    <span className="text-xs font-medium text-slate-700">Distância da rota:</span>
+                    <span className="text-xs font-bold text-slate-900">
+                      {showcase?.distanceKm ? `${showcase.distanceKm} km` : '1.8 km'}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -12,6 +12,19 @@ describe('CmsService', () => {
         findMany: jest.fn(),
         upsert: jest.fn(),
       } as any,
+      order: {
+        count: jest.fn(),
+        findFirst: jest.fn(),
+      } as any,
+      merchant: {
+        count: jest.fn(),
+      } as any,
+      courier: {
+        count: jest.fn(),
+      } as any,
+      rating: {
+        aggregate: jest.fn(),
+      } as any,
     };
     service = new CmsService(prisma as PrismaService);
   });
@@ -89,5 +102,38 @@ describe('CmsService', () => {
     expect(res.success).toBe(true);
     expect(res.leadId).toBeDefined();
     expect(res.message).toContain('equipe de expansão');
+  });
+
+  it('deve retornar estatísticas públicas agregadas com showcase do Supabase', async () => {
+    (prisma.order!.count as any).mockResolvedValue(12);
+    (prisma.merchant!.count as any).mockResolvedValue(8);
+    (prisma.courier!.count as any).mockResolvedValue(5);
+    (prisma.rating!.aggregate as any).mockResolvedValue({
+      _avg: { merchantRating: 4.9 },
+    });
+    (prisma.order!.findFirst as any).mockResolvedValue({
+      id: 'ord-1',
+      items: [{ productName: 'Pizza Calabresa' }],
+      merchant: { name: 'Pizzaria Bella Napoli' },
+      paymentMethod: 'CARD_CREDIT',
+      status: 'DELIVERED',
+      delivery: {
+        distanceKm: 2.5,
+        courier: {
+          vehicleType: 'MOTORCYCLE',
+          plate: 'XYZ-1234',
+          user: { name: 'Carlos Eduardo' },
+        },
+      },
+    });
+
+    const stats = await service.getPlatformStats();
+    expect(stats.deliveredOrdersCount).toBe(12);
+    expect(stats.activeMerchantsCount).toBe(8);
+    expect(stats.activeCouriersCount).toBe(5);
+    expect(stats.averageRating).toBe(4.9);
+    expect(stats.showcaseDelivery).toBeDefined();
+    expect(stats.showcaseDelivery?.productName).toBe('Pizza Calabresa');
+    expect(stats.showcaseDelivery?.merchantName).toBe('Pizzaria Bella Napoli');
   });
 });
