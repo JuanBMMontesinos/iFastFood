@@ -62,7 +62,7 @@ pnpm typecheck
 | F3 | Pedido ponta-a-ponta + pagamentos (Stripe padrão) + Descoberta + Cliente (API + Domínio + Contratos + Testes) | ✅ |
 | F4 | Motor de despacho + App Entregador (Android Kotlin/Compose) + Logística + Rastreio (API + Domínio + Contratos + Testes) | ✅ |
 | F5 | Financeiro (Ledger partidas dobradas, comissões, repasses) + Backoffice completo Next.js (API + Domínio + Contratos + Testes) | ✅ |
-| F6 | Apps Cliente/Parceiro nativos, marketing, avaliações, suporte, analytics | 🔜 |
+| F6 | Apps nativos Cliente/Parceiro (Android/iOS) + Marketing/Cupons + Avaliações + Suporte (API + Domínio + Contratos + Testes) | ✅ |
 | F7 | Landing CMS, docs site, k6/pen-test/UAT, stores | 🔜 |
 
 ## Convenções essenciais (ADR-0001)

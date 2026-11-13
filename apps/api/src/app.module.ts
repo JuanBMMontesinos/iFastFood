@@ -12,6 +12,9 @@ import { OrdersModule } from './orders/orders.module';
 import { CourierModule } from './courier/courier.module';
 import { LogisticsModule } from './logistics/logistics.module';
 import { FinanceModule } from './finance/finance.module';
+import { MarketingModule } from './marketing/marketing.module';
+import { RatingModule } from './rating/rating.module';
+import { SupportModule } from './support/support.module';
 
 /**
  * Monólito modular — os módulos de domínio entram aqui por fase:
@@ -37,6 +40,9 @@ import { FinanceModule } from './finance/finance.module';
     CourierModule,
     LogisticsModule,
     FinanceModule,
+    MarketingModule,
+    RatingModule,
+    SupportModule,
   ],
 })
 export class AppModule {}

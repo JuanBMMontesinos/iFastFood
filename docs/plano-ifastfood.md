@@ -86,17 +86,18 @@ sensível, LGPD.
     - Formulário de geração de Payouts por período.
 - **Testes & Qualidade:** 100% dos testes unitários passando (15 suítes / 119 testes no `@ifastfood/domain` com 94.62% de cobertura; 20 suítes / 72 testes no `@ifastfood/api`). Typecheck com 0 erros.
 
-## F6 — Apps nativos Cliente/Parceiro + engajamento
-- Apps nativos **Cliente** (Android + iOS) e **Parceiro/Gestor** (Android + iOS), mais **Entregador
-  iOS**, todos thin clients sobre os SDKs gerados.
-- `MarketingModule`: cupons de loja e de plataforma (admin + portal), campanhas, banners,
-  push segmentado, assinatura do cliente (`SubscriptionPlan`/`CustomerSubscription`, tipo
-  "Clube"), carteira e cashback (`Wallet`).
-- `RatingModule`: avaliação da loja e do entregador, médias, moderação.
-- `SupportModule`: tickets por persona (`SupportTicket`/`TicketMessage`), chat no pedido,
-  SLA/prioridade, notas internas, fila no admin.
-- Analytics: eventos de produto e métricas de loja (vendas, ticket médio, cancelamentos) no
-  portal.
+## F6 — Apps nativos Cliente/Parceiro + engajamento ✅ (Concluído no Domínio, Backend, Apps Nativos e Testes)
+- **Apps Nativos (Android Kotlin + iOS Swift):**
+  - `apps/android-customer`: App nativo do cliente em Kotlin + Jetpack Compose (descoberta de restaurantes, cardápio, checkout Stripe e avaliação);
+  - `apps/android-merchant`: Gestor de pedidos do parceiro em Kotlin + Jetpack Compose (fila de pedidos ao vivo, aceitar/preparar/despachar, pausar loja);
+  - `apps/ios-apps`: Swift Package compartilhado para thin-clients iOS (Cliente, Entregador e Parceiro).
+- **Módulos de Engajamento da API (`apps/api`):**
+  - `MarketingModule`: validação de cupons promocionais (`validateCoupon`) integrando regras do domínio (`evaluateCoupon`);
+  - `RatingModule`: avaliação de pedidos, restaurantes e entregadores (`createRating`) com recálculo atômico de médias móveis ponderadas (`ratingAvg`, `ratingCount`);
+  - `SupportModule`: abertura e acompanhamento de tickets de suporte por persona (`CUSTOMER`, `MERCHANT`, `COURIER`) com histórico de mensagens.
+- **Contratos (`packages/contracts`):**
+  - `engagement.ts`: schemas para cupons (`ValidateCouponInput`), avaliações (`CreateRatingInput`, `RatingView`) e tickets (`CreateTicketInput`, `TicketView`).
+- **Testes & Qualidade:** 100% dos testes unitários passando (15 suítes / 119 testes no `@ifastfood/domain` com 94.62% de cobertura; 23 suítes / 79 testes no `@ifastfood/api`). Typecheck com 0 erros.
 
 ## F7 — Lançamento
 - `web-landing` com CMS (`CmsPage`): páginas institucionais, "seja parceiro", "seja

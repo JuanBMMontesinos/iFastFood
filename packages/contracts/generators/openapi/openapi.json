@@ -1088,6 +1088,90 @@
           "Finance"
         ]
       }
+    },
+    "/marketing/coupons/validate": {
+      "post": {
+        "operationId": "MarketingController_validateCoupon",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Marketing"
+        ]
+      }
+    },
+    "/ratings": {
+      "post": {
+        "operationId": "RatingController_createRating",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Rating"
+        ]
+      }
+    },
+    "/ratings/orders/{orderId}": {
+      "get": {
+        "operationId": "RatingController_getOrderRating",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Rating"
+        ]
+      }
+    },
+    "/support/tickets": {
+      "post": {
+        "operationId": "SupportController_createTicket",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/support/tickets/me": {
+      "get": {
+        "operationId": "SupportController_getMyTickets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/support/tickets/{id}": {
+      "get": {
+        "operationId": "SupportController_getTicket",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Support"
+        ]
+      }
     }
   },
   "info": {
