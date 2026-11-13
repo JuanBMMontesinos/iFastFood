@@ -9,3 +9,4 @@ export * from './payments';
 export * from './orders';
 export * from './courier';
 export * from './logistics';
+export * from './finance';

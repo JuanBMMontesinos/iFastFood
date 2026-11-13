@@ -1032,6 +1032,62 @@
           "Logistics"
         ]
       }
+    },
+    "/finance/partners/me/payouts": {
+      "get": {
+        "operationId": "FinanceController_getPartnerPayouts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Finance"
+        ]
+      }
+    },
+    "/finance/couriers/me/earnings": {
+      "get": {
+        "operationId": "FinanceController_getCourierEarnings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Finance"
+        ]
+      }
+    },
+    "/finance/admin/payouts/generate": {
+      "post": {
+        "operationId": "FinanceController_generatePayout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Finance"
+        ]
+      }
+    },
+    "/finance/admin/ledger": {
+      "get": {
+        "operationId": "FinanceController_getLedger",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Finance"
+        ]
+      }
     }
   },
   "info": {

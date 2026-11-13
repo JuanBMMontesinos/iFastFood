@@ -11,6 +11,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { OrdersModule } from './orders/orders.module';
 import { CourierModule } from './courier/courier.module';
 import { LogisticsModule } from './logistics/logistics.module';
+import { FinanceModule } from './finance/finance.module';
 
 /**
  * Monólito modular — os módulos de domínio entram aqui por fase:
@@ -35,6 +36,7 @@ import { LogisticsModule } from './logistics/logistics.module';
     OrdersModule,
     CourierModule,
     LogisticsModule,
+    FinanceModule,
   ],
 })
 export class AppModule {}

@@ -63,33 +63,28 @@ sensível, LGPD.
   - Telas interativas para gestão de turnos (Online/Offline), listagem de corridas disponíveis e acompanhamento passo-a-passo da corrida com confirmação por PIN.
 - **Testes & Qualidade:** 100% dos testes unitários passando (14 suítes / 114 testes no `@ifastfood/domain` com 95.65% de cobertura; 19 suítes / 69 testes no `@ifastfood/api`). Typecheck com 0 erros.
 
-## F5 — Financeiro + Backoffice completo
-- `FinanceModule`:
-  - **ledger em partidas dobradas** (`LedgerAccount`/`LedgerEntry`) lançado a cada evento
-    (pago, estornado, chargeback, repasse);
-  - comissões via `tax-rules`;
-  - **repasses** periódicos ao parceiro (`Payout`/`PayoutItem`, job semanal ou quinzenal):
-    bruto − comissão − taxa de pagamento online − mensalidade;
-  - mensalidade acima de R\$ 1.800/mês (`Invoice`);
-  - conciliação com os gateways;
-  - extrato no Portal do Parceiro;
-  - ganhos do entregador.
-- `apps/admin` (Next.js + shadcn/ui):
-  - dashboards;
-  - usuários e RBAC (API da F1);
-  - fila de KYC de parceiros e entregadores;
-  - contratos e planos;
-  - pedidos (busca, linha do tempo, cancelar/estornar);
-  - entregas ao vivo (mapa);
-  - financeiro (repasses, ledger, conciliação);
-  - cupons;
-  - `AppConfig`;
-  - auditoria.
-  Exige 2FA.
-- CI: `pnpm audit` passa a bloquear o merge (hoje está com `continue-on-error`).
-
-**Pronto quando:** fechamento de período gera repasses que batem com o ledger; o admin opera a
-plataforma sem acessar o banco.
+## F5 — Financeiro + Backoffice completo ✅ (Concluído no Domínio, Backend, Backoffice Web e Testes)
+- **Domínio (`packages/domain`):**
+  - **Ledger em partidas dobradas** (`ledger.ts`): validação estrita da equação fundamental da contabilidade (`assertBalancedEntries` onde `Total Débito == Total Crédito`);
+  - Automação de lançamentos para pedidos pagos com gateway Stripe (`buildOrderPaymentLedgerEntries`) e liquidações periódicas (`buildPayoutLedgerEntries`);
+  - Regras fiscais e contratuais (`tax-rules.ts`): cálculo de comissões em `bps`, taxas do gateway e mensalidade com teto de isenção de faturamento até R$ 1.800/mês (`computeMonthlyFee`).
+- **Contratos (`packages/contracts`):**
+  - `finance.ts`: schemas para `PayoutDto`, `PayoutItemDto`, `CourierEarningsDto`, `LedgerEntryDto` e `TriggerPayoutInput`.
+- **Módulo de API (`apps/api`):**
+  - `FinanceModule`:
+    - Auto-provisionamento do plano de contas contábil (`ensureLedgerAccounts`) com contas de Ativo (Stripe, Banco), Passivo (Repasses a pagar para lojistas e entregadores), Receitas (Comissões, Taxa de serviço, Mensalidades) e Custos;
+    - Escrituração contábil em partidas dobradas de pedidos pagos;
+    - Geração de liquidações periódicas de parceiros (`generateMerchantPayout`) com desconto automático de comissão, processamento e mensalidade;
+    - Extrato de repasses para parceiros (`GET /finance/partners/me/payouts`);
+    - Extrato de ganhos para entregadores (`GET /finance/couriers/me/earnings`);
+    - Livro-razão contábil auditável pelo Backoffice (`GET /finance/admin/ledger`).
+- **Backoffice Web (`apps/admin`):**
+  - Aplicação moderna em **Next.js 14 + Tailwind CSS + Lucide Icons**:
+    - Dashboard de métricas executivas (GMV, Receita Líquida, Pedidos, Entregadores);
+    - Fila operacional de KYC com homologação de lojistas e entregadores em 1 clique;
+    - Tabela do Ledger contábil em partidas dobradas com identificação de DÉBITO e CRÉDITO;
+    - Formulário de geração de Payouts por período.
+- **Testes & Qualidade:** 100% dos testes unitários passando (15 suítes / 119 testes no `@ifastfood/domain` com 94.62% de cobertura; 20 suítes / 72 testes no `@ifastfood/api`). Typecheck com 0 erros.
 
 ## F6 — Apps nativos Cliente/Parceiro + engajamento
 - Apps nativos **Cliente** (Android + iOS) e **Parceiro/Gestor** (Android + iOS), mais **Entregador

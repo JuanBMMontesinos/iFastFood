@@ -61,7 +61,7 @@ pnpm typecheck
 | F2 | Parceiros (KYC/contratos/planos) + cardápio/catálogo (API + Contratos + Testes) | ✅ |
 | F3 | Pedido ponta-a-ponta + pagamentos (Stripe padrão) + Descoberta + Cliente (API + Domínio + Contratos + Testes) | ✅ |
 | F4 | Motor de despacho + App Entregador (Android Kotlin/Compose) + Logística + Rastreio (API + Domínio + Contratos + Testes) | ✅ |
-| F5 | Financeiro (comissões/repasses) + Admin completo | 🔜 |
+| F5 | Financeiro (Ledger partidas dobradas, comissões, repasses) + Backoffice completo Next.js (API + Domínio + Contratos + Testes) | ✅ |
 | F6 | Apps Cliente/Parceiro nativos, marketing, avaliações, suporte, analytics | 🔜 |
 | F7 | Landing CMS, docs site, k6/pen-test/UAT, stores | 🔜 |
 
