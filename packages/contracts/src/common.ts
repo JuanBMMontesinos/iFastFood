@@ -35,6 +35,38 @@ export const passwordSchema = z
 
 export const nameSchema = z.string().trim().min(2).max(120);
 
+/**
+ * CNPJ (14 dígitos) com dígitos verificadores válidos.
+ * Aceita formatado ou apenas dígitos; normaliza para 14 dígitos.
+ */
+export const cnpjSchema = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/\D/g, ''))
+  .refine((v) => v.length === 14, 'CNPJ deve ter 14 dígitos')
+  .refine(
+    (v) => !/^(\d)\1+$/.test(v),
+    'CNPJ inválido (sequência repetida)',
+  )
+  .refine((v) => isValidCnpj(v), 'CNPJ inválido (dígitos verificadores)');
+
+/** Algoritmo oficial dos dígitos verificadores do CNPJ (pesos 2..9, 5, 4, 3, 2). */
+export function isValidCnpj(cnpj: string): boolean {
+  const digits = cnpj.replace(/\D/g, '');
+  if (digits.length !== 14) return false;
+  const calc = (base: string, weights: number[]): number => {
+    let sum = 0;
+    for (let i = 0; i < weights.length; i++) {
+      sum += Number(base[i]) * weights[i]!;
+    }
+    const rest = sum % 11;
+    return rest < 2 ? 0 : 11 - rest;
+  };
+  const d1 = calc(digits.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const d2 = calc(digits.slice(0, 13), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  return Number(digits[12]) === d1 && Number(digits[13]) === d2;
+}
+
 // ---- Paginação -------------------------------------------------------------
 export const paginationQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

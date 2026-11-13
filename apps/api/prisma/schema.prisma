@@ -59,6 +59,12 @@ enum MerchantStaffRole {
   OPERATOR
 }
 
+enum MerchantDocumentType {
+  CNPJ_CARD
+  SOCIAL_CONTRACT
+  ID_CARD
+}
+
 enum CouponType {
   PERCENTAGE
   FIXED
@@ -493,6 +499,7 @@ model Merchant {
 
   contract       MerchantContract?
   staff          MerchantStaff[]
+  documents      MerchantDocument[]
   menuCategories MenuCategory[]
   hours          BusinessHour[]
   zones          DeliveryZone[]
@@ -530,6 +537,27 @@ model MerchantStaff {
   createdAt  DateTime          @default(now())
 
   @@unique([merchantId, userId])
+}
+
+/**
+ * KYC do parceiro (F2): documentos exigidos para ativação da loja.
+ * `fileUrl` aponta para o storage (upload na F2 mobile/F7 hardening).
+ * Um documento por tipo por loja — reenvio substitui o anterior (upsert).
+ */
+model MerchantDocument {
+  id               String               @id @default(uuid())
+  merchantId       String
+  merchant         Merchant             @relation(fields: [merchantId], references: [id])
+  type             MerchantDocumentType
+  fileUrl          String
+  status           DocumentStatus       @default(PENDING)
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  rejectReason     String?
+  createdAt        DateTime             @default(now())
+
+  @@unique([merchantId, type])
+  @@index([merchantId, status])
 }
 
 // ==========================================================

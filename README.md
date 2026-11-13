@@ -4,7 +4,7 @@ Plataforma marketplace de delivery (comida, mercado, farmácia, bebidas) similar
 app do cliente, app do entregador, portal + gestor de pedidos do parceiro, backoffice
 administrativo e landing page institucional.
 
-> Plano completo do projeto: `C:\Users\jubam\.opencode\plan\ifastfood-plan.md`
+> Plano completo do projeto: [`docs/plano-ifastfood.md`](docs/plano-ifastfood.md)
 > ADRs de arquitetura: [`docs/adr/`](docs/adr)
 
 ## Estrutura do monorepo
@@ -58,8 +58,8 @@ pnpm typecheck
 |---|---|---|
 | F0 | Monorepo, domínio+testes, contratos, API skeleton, Docker, CI, ADRs | ✅ |
 | F1 | Identidade/RBAC/LGPD/auditoria | ✅ |
-| F2 | Parceiros (KYC/contratos/planos) + cardápio + Portal Parceiro | 🔜 |
-| F3 | Pedido ponta-a-ponta + gateways + PWA cliente + Gestor de Pedidos (MVP) | 🔜 |
+| F2 | Parceiros (KYC/contratos/planos) + cardápio/catálogo (API + Contratos + Testes) | ✅ |
+| F3 | Pedido ponta-a-ponta + gateways (Stripe padrão) + PWA cliente + Gestor de Pedidos | 🔜 |
 | F4 | Motor de despacho + App Entregador (Android) | 🔜 |
 | F5 | Financeiro (comissões/repasses) + Admin completo | 🔜 |
 | F6 | Apps Cliente/Parceiro nativos, marketing, avaliações, suporte, analytics | 🔜 |

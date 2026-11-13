@@ -39,3 +39,6 @@ ios/**/xcuserdata/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# node_modules herdados de outra máquina (sem permissão p/ apagar)
+*.old-machine/
