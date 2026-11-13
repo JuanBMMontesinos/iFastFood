@@ -8,10 +8,13 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "dev": "turbo run dev",
+    "dev:api": "turbo run dev --filter=@ifastfood/api",
+    "dev:admin": "turbo run dev --filter=@ifastfood/admin",
+    "dev:landing": "turbo run dev --filter=@ifastfood/web-landing",
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "dev:api": "turbo run dev --filter=@ifastfood/api",
     "db:up": "docker compose up -d postgres redis",
     "db:down": "docker compose down"
   },
