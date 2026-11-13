@@ -4,6 +4,7 @@ export * from './money';
 export * from './types';
 export * from './finance/tax-rules';
 export * from './order/state-machine';
+export * from './order/pricing';
 export * from './delivery/state-machine';
 export * from './geo/haversine';
 export * from './logistics/delivery-fee';

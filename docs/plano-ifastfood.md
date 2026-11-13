@@ -30,36 +30,20 @@ sensível, LGPD.
 **Testes:** unitários com 100% de sucesso nos services e na máquina de estados de parceiros.
 **Status:** Backend concluído e testado. A interface web do `web-merchant` será construída em conjunto com o Gestor de Pedidos.
 
-## F3 — Pedido ponta a ponta + pagamentos + PWA do cliente + Gestor de Pedidos (MVP)
-**Módulos de API**
-- `CustomerModule`: perfil, endereços (`Address`) e geocodificação (Google Maps).
-- `DiscoveryModule`: lojas abertas que entregam no endereço (zonas RADIUS/POLYGON + `haversine` +
-  `isOpenNow`), página da loja e cardápio público. Busca com Meilisearch (profile `search`).
-- `CartModule` (Redis): carrinho por loja; validação de complementos (min/max/required).
-- `OrderModule`:
-  - checkout com cálculo no servidor: itens + frete (`delivery-fee`) + taxa de serviço
-    (`AppConfig`, R\$ 0,99–2,49) − cupom (`coupon`);
-  - snapshot do contrato no pedido (comissão/taxa em bps);
-  - transições sempre via `assertOrderTransition`, gravando `OrderEventOrderState`;
-  - código público `IF-XXXXX`;
-  - expiração automática do aceite (5 min, job BullMQ).
-- `PaymentModule`: `PaymentGatewayPort` com adaptadores **Mercado Pago** (PIX + cartão) e
-  **Stripe**; `CASH`/`OFFLINE`; webhooks idempotentes (`WebhookEvent`); estornos (`Refund`).
-  Escopo PCI SAQ-A (tokenização no gateway).
-- `RealtimeModule`: WebSocket/SSE para o status do pedido (cliente) e para novos pedidos (Gestor).
-- `NotificationModule`: push (FCM), e-mail (Resend) e SMS, com fila e tabela `Notification`.
-
-**Frontends**
-- `web-customer` (PWA): login por OTP, endereço, lista de lojas, loja/cardápio, carrinho, checkout
-  (PIX com QR e cartão), acompanhamento em tempo real, histórico.
-- `web-merchant` → Gestor de Pedidos: fila com alerta sonoro, aceitar/recusar, preparo, pronto,
-  impressão do pedido, pausar produto ou loja.
-
-**Domínio novo:** cálculo do total do pedido, validação do carrinho/complementos, geração de
-código, cálculo de comissão por pedido.
-
-**Pronto quando:** cliente faz o pedido com PIX de sandbox → webhook confirma → loja aceita e
-prepara → pedido marcado como entregue (entrega própria da loja, plano BÁSICO).
+## F3 — Pedido ponta a ponta + pagamentos Stripe + Descoberta + Cliente ✅ (Concluído no Backend / Domínio / Contratos / Testes)
+**Módulos de API & Domínio:**
+- `CustomerModule`: auto-provisionamento, perfil, catálogo de endereços (`Address`) com endereço padrão e geolocalização.
+- `DiscoveryModule`: feed geolocalizado de lojas abertas que entregam no endereço (`haversine`, raio da zona de entrega, taxa calculada e validação de funcionamento `isOpenNow` em tempo real no fuso America/Sao_Paulo).
+- `PaymentsModule`: gateway padrão **Stripe** (`StripeAdapter`), criação de `PaymentIntent`, webhooks idempotentes (`WebhookEvent`), estornos (`Refund`) e suporte a dinheiro/offline (`CASH`).
+- `OrdersModule`:
+  - Checkout com cálculo estrito no servidor (`pricing.ts`): validação de itens, complementos, taxa de entrega, taxa de serviço e cupom;
+  - Snapshot de contrato no pedido (comissão em bps e taxa de gateway);
+  - Código público `IF-XXXXX`;
+  - Linha do tempo de eventos (`OrderEventOrderState`);
+  - Gestão de pedidos pelo parceiro (`GET /partners/me/orders` e `POST /partners/me/orders/:id/action`);
+  - Transição permitida de `DISPATCHED -> DELIVERED` para entregas próprias da loja (Plano Básico).
+- **Testes & Qualidade:** 100% dos testes unitários passando (13 suítes / 106 testes no `@ifastfood/domain` com 95.65% de cobertura; 17 suítes / 56 testes no `@ifastfood/api`). Typecheck com zero erros.
+- **Frontends previstos:** PWA `web-customer` e painel `web-merchant` para consumo dos contratos e endpoints validados.
 
 ## F4 — Motor de despacho + App do Entregador (Android)
 - `CourierModule`: onboarding, documentos (CNH, CRLV, selfie...), revisão admin
@@ -134,10 +118,9 @@ plataforma sem acessar o banco.
 
 ---
 
-## Decisões em aberto [DECIDIR]
-1. **Apps nativos:** manter 6 apps nativos (Kotlin + Swift), conforme o ADR-0001, ou reduzir
-   custo (por exemplo, só o entregador nativo, e cliente/parceiro como PWA)?
-2. **Gateway inicial:** Mercado Pago primeiro (PIX), Stripe depois?
-3. **Hospedagem de produção:** onde a API e os frontends vão rodar?
-4. **Cidade/região piloto** (afeta zonas, mapas e o despacho).
-5. **Escopo do MVP:** lançar após F3 (entrega própria da loja) ou só após F4/F5?
+## Decisões Arquiteturais Consolidadas
+1. **Apps nativos:** Mantidos 6 apps nativos (Kotlin + Swift) gerados via OpenAPI codegen (`packages/contracts/generators`).
+2. **Gateway padrão:** **Stripe** como provedor padrão de pagamentos (com arquitetura multi-gateway para expansão futura).
+3. **Escopo do MVP:** Lançamento oficial do MVP após a conclusão da fase **F5** (inclui Despacho + App Entregador + Financeiro + Backoffice).
+4. **Banco de Dados & Migrações:** Migrations versionadas aplicadas diretamente no Supabase pela IA (`apps/api/prisma/migrations/`).
+5. **Garantia de Qualidade & Git:** Cada fase só é finalizada após 100% dos testes unitários passarem sem erro, seguida de commit descritivo e push.

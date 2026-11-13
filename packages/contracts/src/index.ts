@@ -3,3 +3,7 @@ export * from './common';
 export * from './identity';
 export * from './partners';
 export * from './menu';
+export * from './customer';
+export * from './discovery';
+export * from './payments';
+export * from './orders';

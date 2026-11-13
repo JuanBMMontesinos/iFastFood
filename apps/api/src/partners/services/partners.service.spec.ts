@@ -139,6 +139,7 @@ describe('PartnersService', () => {
         phone: '+5511999998888',
         password: 'Password123!',
         cnpj: '11222333000181',
+        acceptedLgpd: true,
       },
       { ip: '127.0.0.1', userAgent: 'test' },
     );
@@ -174,8 +175,8 @@ describe('PartnersService', () => {
 
     const list = await service.listHours('merch-1');
     expect(list.length).toBe(2);
-    expect(list[0].openMinutes).toBe(1080);
-    expect(list[0].closeMinutes).toBe(1410);
+    expect(list[0]!.openMinutes).toBe(1080);
+    expect(list[0]!.closeMinutes).toBe(1410);
   });
 
   it('deve criar, atualizar e remover áreas de entrega (DeliveryZone)', async () => {

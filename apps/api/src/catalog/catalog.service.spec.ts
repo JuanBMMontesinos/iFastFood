@@ -178,10 +178,10 @@ describe('CatalogService', () => {
     // 4. Buscar árvore completa
     const tree = await service.getMenuTree(partner.merchantId);
     expect(tree.categories.length).toBe(1);
-    expect(tree.categories[0].products.length).toBe(1);
-    expect(tree.categories[0].products[0].name).toBe('Pizza Margherita');
-    expect(tree.categories[0].products[0].optionGroups.length).toBe(1);
-    expect(tree.categories[0].products[0].optionGroups[0].options.length).toBe(2);
+    expect(tree.categories[0]!.products.length).toBe(1);
+    expect(tree.categories[0]!.products[0]!.name).toBe('Pizza Margherita');
+    expect(tree.categories[0]!.products[0]!.optionGroups.length).toBe(1);
+    expect(tree.categories[0]!.products[0]!.optionGroups[0]!.options.length).toBe(2);
   });
 
   it('deve pausar e despausar produto (gestor de pedidos)', async () => {

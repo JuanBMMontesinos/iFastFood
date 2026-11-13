@@ -59,7 +59,7 @@ pnpm typecheck
 | F0 | Monorepo, domínio+testes, contratos, API skeleton, Docker, CI, ADRs | ✅ |
 | F1 | Identidade/RBAC/LGPD/auditoria | ✅ |
 | F2 | Parceiros (KYC/contratos/planos) + cardápio/catálogo (API + Contratos + Testes) | ✅ |
-| F3 | Pedido ponta-a-ponta + gateways (Stripe padrão) + PWA cliente + Gestor de Pedidos | 🔜 |
+| F3 | Pedido ponta-a-ponta + pagamentos (Stripe padrão) + Descoberta + Cliente (API + Domínio + Contratos + Testes) | ✅ |
 | F4 | Motor de despacho + App Entregador (Android) | 🔜 |
 | F5 | Financeiro (comissões/repasses) + Admin completo | 🔜 |
 | F6 | Apps Cliente/Parceiro nativos, marketing, avaliações, suporte, analytics | 🔜 |
